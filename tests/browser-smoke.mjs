@@ -89,6 +89,22 @@ try{
  assert.equal(stored.attempts.length,1);
  assert.equal(stored.stars,1);
  console.log('PASS independent correct answer earns one persisted star');
+ await rewardPage.evaluate(()=>{
+  const key='study-game-state-v1';
+  const saved=JSON.parse(localStorage.getItem(key));
+  saved.reviews['math.add.10'].dueAt='2000-01-01T00:00:00.000Z';
+  localStorage.setItem(key,JSON.stringify(saved));
+ });
+ await rewardPage.reload();
+ await rewardPage.locator('#next').click();
+ assert.equal(await rewardPage.locator('.quiz').last().locator('h2').innerText(),'4 + 3 = ?');
+ await rewardPage.locator('[data-answer]').nth(1).click();
+ await rewardPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
+ assert.match(await rewardPage.locator('.stars').innerText(),/1개/);
+ const repeated=await rewardPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.equal(repeated.stars,1);
+ assert.equal(repeated.attempts.filter(a=>a.questionId==='m1-add').length,2);
+ console.log('PASS repeated independent correct answer does not grant another star');
  await rewardContext.close();
  const hintContext=await browser.newContext();
  await hintContext.addInitScript(()=>{Math.random=()=>0;});
