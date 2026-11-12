@@ -38,7 +38,7 @@ try{
  const answers=page.locator('[data-answer]');
  assert.equal(await answers.count(),3);
  await answers.first().click();
- assert.ok((await page.locator('.feedback').innerText()).length>0);
+ await page.locator('.feedback').filter({hasText:/\S/}).waitFor({timeout:5000});
  console.log('PASS answer interaction for '+q);
  await page.close();
 }finally{
