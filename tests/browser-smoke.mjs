@@ -79,7 +79,7 @@ try{
  await rewardContext.addInitScript(()=>{Math.random=()=>0;});
  const rewardPage=await rewardContext.newPage();
  await rewardPage.goto(url);
- assert.match(await rewardPage.locator('.quiz').last().locator('h2').innerText(),/4 \\+ 3/);
+ assert.equal(await rewardPage.locator('.quiz').last().locator('h2').innerText(),'4 + 3 = ?');
  await rewardPage.locator('[data-answer]').nth(1).click();
  await rewardPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
  assert.match(await rewardPage.locator('.stars').innerText(),/1개/);
