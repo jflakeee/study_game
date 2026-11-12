@@ -61,15 +61,18 @@ function render(){
   const step=advanceTutor(tutor,correct,q.hint,q.explanation);
   tutor=step.session;
   if(correct){
-   state=recordAttempt(state,q,answer,usedHint||tutor.attempts>0,new Date());
+   const next=recordAttempt(state,q,answer,usedHint||tutor.attempts>0,new Date());
+   const gained=next.stars>state.stars;
+   const saved=saveState(localStorage,next);
+   if(saved)state=next;
    finished=true;
-   const saved=saveState(localStorage,state);
-   feedback='정답이에요! ⭐ '+step.message+(saved?'':' 저장에 실패했어요.');
+   feedback=saved?'정답이에요! '+(gained?'⭐ 별 1개 획득! ':'')+step.message:'정답이지만 저장에 실패했어요. 별과 학습 기록은 반영되지 않았어요.';
   }else if(step.showExplanation){
-   state=recordAttempt(state,q,answer,true,new Date());
+   const next=recordAttempt(state,q,answer,true,new Date());
+   const saved=saveState(localStorage,next);
+   if(saved)state=next;
    finished=true;
-   const saved=saveState(localStorage,state);
-   feedback=step.message+(saved?'':' 저장에 실패했어요.');
+   feedback=saved?step.message:'저장에 실패했어요. 학습 기록은 반영되지 않았어요.';
   }else{
    usedHint=true;
    feedback=step.message;
