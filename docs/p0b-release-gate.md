@@ -1,27 +1,26 @@
-# P0-B release gate — 2026-11-12
+# P0-B release gate — 2026-11-13
 
-## Verified by GitHub Actions
-- Latest branch test and Vite build: successful, run 43174192498, commit 789c654361822188d7e0400dd5e1a00ee1cd738e.
-- P0-B source is on feat/p0b-learning-engine; main remains unchanged.
+## Automated verification (verified)
+- Commit b6a5a533436940344cb05a5e1990c032f7e45263: GitHub Actions run 43192484586 **success**.
+- npm unit tests, Vite build and headless Chromium smoke tests passed on the feature branch.
+- Chromium checks: 320/375/390/768px widths, horizontal overflow, 44px minimum enabled control targets, clipped controls, grade selection, hint, answer feedback, stale-tab conflict/reload, injected localStorage write failure.
+- Build artifact 13930549042 and Chromium screenshot artifact 13930364366 exist in run 43192484586.
+- These screenshots are generated and archived; no human visual review is claimed.
 
-## Manual mobile browser checks (NOT YET VERIFIED)
-- [ ] 320px, 375px, 390px, and tablet widths: no horizontal scroll or clipped controls
-- [ ] Touch each answer once; reward only once; choices disable after completion
-- [ ] Wrong answer 1/2/3: progressive hint and explanation; no stars on wrong answer
-- [ ] Change grades 1/2/3: matching questions and concepts
-- [ ] Finish two different questions independently: concept mastery level 4
-- [ ] Reload page: grade, stars, attempts, and review schedule persist
-- [ ] Legacy v1 localStorage payload: load without migration or data loss
-- [ ] Block localStorage writes: show failure and ensure reward is not falsely reported as persisted
-- [ ] Two tabs simultaneously: assess stale-state overwrite
-- [ ] Check keyboard navigation, focus, accessible status announcements
+## Not yet verified / release blockers
+- [ ] Human review of screenshots and hands-on touch behavior on physical iOS/Android devices.
+- [ ] Complete wrong-answer 1/2/3 progressive tutoring, explanation and no-reward behavior in a real browser.
+- [ ] Distinct-question mastery level 4 and once-per-question reward behavior end-to-end in Chromium.
+- [ ] Legacy v1 payload compatibility and full review schedule persistence in Chromium.
+- [ ] Keyboard navigation, screen-reader announcements and accessible focus.
+- [ ] Production P0-B preview URL and published Pages smoke test after explicit release approval.
 
-## Known limitations requiring decisions before public release
-- New question selection may repeat the same question; there is no session-level exclusion.
-- Mastery level 4 is derived from distinct question IDs, but stars are still awarded per correct attempt; repeat farming remains possible.
-- Response-time rating helper exists but is not yet wired to the UI.
-- The v1 storage schema is unchanged; mastery is reconstructed from attempt history.
-- No real-device browser session or published P0-B URL has been verified.
+## Known limitations
+- A question can repeat in a session; session-level exclusion is not implemented.
+- Stars are awarded once per question for an independent correct response; repeat rewards are covered by unit tests, not yet a dedicated Chromium test.
+- Response-time rating helper is not connected to the main UI.
+- v1 save format is retained; mastery is reconstructed from attempt history.
+- Web Locks serialize saves where available; fallback optimistic checks are not atomic across tabs.
 
 ## Release decision
-**HOLD** until the above checks pass. Do not merge to main or trigger Pages deployment based only on CI.
+**HOLD**: keep main and public GitHub Pages unchanged until the remaining release blockers are resolved and approved. CI success does not imply real-device or public-deployment verification.
