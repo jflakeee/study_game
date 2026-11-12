@@ -26,3 +26,11 @@ export function updateMastery(previous:Mastery|undefined,e:Evidence):Mastery {
 export function selectDueConcepts(conceptIds:readonly string[],dueByConcept:Record<string,string|undefined>,now:Date):string[]{
  return conceptIds.filter(id=>!dueByConcept[id]||new Date(dueByConcept[id]!).getTime()<=now.getTime());
 }
+/** Rebuild concept progress from existing v1 attempts, without a storage migration. */
+export function masteryFromAttempts(attempts:readonly Evidence[],conceptId:string):Mastery|undefined{
+ let result:Mastery|undefined;
+ for(const attempt of attempts){
+  if(attempt.conceptId===conceptId)result=updateMastery(result,attempt);
+ }
+ return result;
+}
