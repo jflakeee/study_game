@@ -100,6 +100,30 @@ try{
  assert.match(await hintPage.locator('.stars').innerText(),/0개/);
  console.log('PASS hinted correct answer does not earn a star');
  await hintContext.close();
+ const masteryContext=await browser.newContext();
+ await masteryContext.addInitScript(()=>{Math.random=()=>0;});
+ const masteryPage=await masteryContext.newPage();
+ await masteryPage.goto(url);
+ await masteryPage.locator('[data-answer]').nth(1).click();
+ await masteryPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
+ await masteryPage.evaluate(()=>{
+  const key='study-game-state-v1';
+  const saved=JSON.parse(localStorage.getItem(key));
+  saved.reviews['math.add.10'].dueAt='2000-01-01T00:00:00.000Z';
+  localStorage.setItem(key,JSON.stringify(saved));
+ });
+ await masteryPage.reload();
+ await masteryPage.evaluate(()=>{Math.random=()=>0.2;});
+ await masteryPage.locator('#next').click();
+ assert.equal(await masteryPage.locator('.quiz').last().locator('h2').innerText(),'6 + 2 = ?');
+ await masteryPage.locator('[data-answer]').nth(1).click();
+ await masteryPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
+ assert.match(await masteryPage.locator('.stars').innerText(),/2개/);
+ await masteryPage.locator('.quiz').filter({hasText:/오늘의 복습/}).getByText(/10 안의 덧셈 · 숙련도 4\/5/).waitFor();
+ const masterySaved=await masteryPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.deepEqual(masterySaved.attempts.map(a=>a.questionId),['m1-add','m1-add-2']);
+ console.log('PASS two distinct independent correct answers yield mastery 4 and two persisted stars');
+ await masteryContext.close();
 }finally{
  await browser?.close();
  server.kill();
