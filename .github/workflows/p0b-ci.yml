@@ -17,7 +17,9 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:browser
+      - name: Chromium browser smoke test
+        timeout-minutes: 3
+        run: npm run test:browser
       - name: Upload isolated P0-B preview build
         uses: actions/upload-artifact@v4
         with:
