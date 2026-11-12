@@ -22,3 +22,20 @@ export function saveStateIfUnchanged(storage:Pick<Storage,'getItem'|'setItem'>,e
   return 'saved';
  }catch{return 'error';}
 }
+
+/** Serialize read-check-write under Web Locks where supported.
+ * Fallback retains optimistic conflict detection, but cannot guarantee atomicity.
+ */
+export async function saveStateSafely(
+ storage:Pick<Storage,'getItem'|'setItem'>,
+ expected:GameState,
+ next:GameState,
+ locks?:Pick<LockManager,'request'>
+):Promise<'saved'|'conflict'|'error'>{
+ if(!locks)return saveStateIfUnchanged(storage,expected,next);
+ try{
+  return await locks.request('study-game-v1-state', {mode:'exclusive'},()=>{
+   return saveStateIfUnchanged(storage,expected,next);
+  });
+ }catch{return 'error';}
+}
