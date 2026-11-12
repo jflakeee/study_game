@@ -53,6 +53,22 @@ try{
  assert.equal(await tabB.locator('#grade').inputValue(),'2');
  console.log('PASS stale-tab conflict and reload persistence');
  await context.close();
+ const failureContext=await browser.newContext();
+ await failureContext.addInitScript(()=>{
+  const original=Storage.prototype.setItem;
+  Storage.prototype.setItem=function(key,value){
+   if(key==='study-game-state-v1')throw new Error('simulated storage quota failure');
+   return original.call(this,key,value);
+  };
+ });
+ const failedPage=await failureContext.newPage();
+ await failedPage.goto(url);
+ await failedPage.locator('#grade').selectOption('3');
+ await failedPage.locator('.feedback').filter({hasText:/저장에 실패/}).waitFor();
+ assert.equal(await failedPage.locator('#grade').inputValue(),'1');
+ assert.match(await failedPage.locator('.stars').innerText(),/0개/);
+ console.log('PASS blocked localStorage does not mutate visible grade or rewards');
+ await failureContext.close();
 }finally{
  await browser?.close();
  server.kill();
