@@ -3,7 +3,7 @@ import {questionsFor,recordAttempt,type Grade,type Question} from './learning.ts
 import {loadState,saveState} from './storage.ts';
 import {isDue} from './review.ts';
 import {beginTutor,advanceTutor,type TutorSession} from './tutor.ts';
-import {concepts} from './mastery.ts';
+import {concepts,masteryFromAttempts} from './mastery.ts';
 const root=document.querySelector<HTMLElement>('#app');if(!root)throw new Error('Missing app root');
 let state=loadState(localStorage);
 let selected:Question|null=null;
@@ -27,9 +27,17 @@ function render(){
  const answered=state.attempts.length;
  const success=state.attempts.filter(a=>a.correct).length;
  const concept=q?concepts.find(c=>c.id===q.skillId):null;
+ const progress=concepts.filter(item=>item.grade===state.grade).map(item=>{
+  const history=state.attempts.filter(a=>a.skillId===item.id).map(a=>({conceptId:a.skillId,questionId:a.questionId,correct:a.correct,usedHint:a.usedHint,at:a.at}));
+  const mastery=masteryFromAttempts(history,item.id);
+  const review=state.reviews[item.id];
+  return {concept:item,level:mastery?.level??0,due:isDue(review,new Date()),dueAt:review?.dueAt};
+ });
+ const dueCount=progress.filter(p=>p.due).length;
  root.innerHTML=`<div class="shell"><header><div class="eyebrow">STUDY GAME · P0-B</div><h1>🌱 지식 탐험대</h1><p>스스로 생각하고 마을을 키워요!</p></header>
  <section class="toolbar"><label for="grade">학년 선택</label><select id="grade">${[1,2,3].map(n=>`<option value="${n}" ${state.grade===n?'selected':''}>${n}학년</option>`).join('')}</select><span class="stars" aria-live="polite">⭐ ${state.stars}개</span></section>
  <section class="village" aria-label="마을 성장"><div class="land">🏡 ${'🌳'.repeat(Math.min(8,Math.floor(state.stars/2)))}${state.stars>=4?'🏫':''}</div><small>학습 기록: ${answered}문제 · 정답 ${success}개</small></section>
+ <section class="quiz" aria-label="개념별 학습 현황"><h2>📚 오늘의 복습 · ${dueCount}개 개념</h2>${progress.map(p=>`<p>${p.concept.subject==='math'?'🔢':'📖'} ${escape(p.concept.title)} · 숙련도 ${p.level}/5 · ${p.due?'지금 복습':'다음 복습 '+escape(new Date(p.dueAt!).toLocaleDateString('ko-KR'))}</p>`).join('')}</section>
  ${q?`<section class="quiz"><div class="subject">${q.subject==='math'?'🔢 수학':'📖 국어'} · ${state.grade}학년 · ${escape(concept?.title??'학습')}</div><h2>${escape(q.prompt)}</h2>
  <div class="choices">${q.choices.map((c,i)=>`<button class="choice" data-answer="${i}" ${finished?'disabled':''}>${escape(c)}</button>`).join('')}</div>
  <button class="hint" id="hint" ${finished?'disabled':''}>💡 생각 도우미</button>
