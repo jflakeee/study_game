@@ -7,17 +7,18 @@
 - Build artifact 13930549042 and Chromium screenshot artifact 13930364366 exist in run 43192484586.
 - These screenshots are generated and archived; no human visual review is claimed.
 
+- Commit 4a434ff22c1f4ee31cc97ac136db5ff762ab851a: GitHub Actions run 43318016660 **success**. Chromium additionally verified independent correct reward persistence, hinted correct no reward, repeated-question no extra star, and mastery level 4 from two distinct independent correct question IDs.
+
 ## Not yet verified / release blockers
 - [ ] Human review of screenshots and hands-on touch behavior on physical iOS/Android devices.
 - [ ] Complete wrong-answer 1/2/3 progressive tutoring, explanation and no-reward behavior in a real browser.
-- [ ] Distinct-question mastery level 4 and once-per-question reward behavior end-to-end in Chromium.
 - [ ] Legacy v1 payload compatibility and full review schedule persistence in Chromium.
 - [ ] Keyboard navigation, screen-reader announcements and accessible focus.
 - [ ] Production P0-B preview URL and published Pages smoke test after explicit release approval.
 
 ## Known limitations
 - A question can repeat in a session; session-level exclusion is not implemented.
-- Stars are awarded once per question for an independent correct response; repeat rewards are covered by unit tests, not yet a dedicated Chromium test.
+- Stars are awarded once per question for an independent correct response; repeat rewards are covered by unit tests and Chromium checks.
 - Response-time rating helper is not connected to the main UI.
 - v1 save format is retained; mastery is reconstructed from attempt history.
 - Web Locks serialize saves where available; fallback optimistic checks are not atomic across tabs.
