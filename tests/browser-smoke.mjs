@@ -129,7 +129,7 @@ try{
   localStorage.setItem(key,JSON.stringify(saved));
  });
  await masteryPage.reload();
- await masteryPage.evaluate(()=>{Math.random=()=>0.2;});
+ await masteryPage.evaluate(()=>{Math.random=()=>0.4;});
  await masteryPage.locator('#next').click();
  assert.equal(await masteryPage.locator('.quiz').last().locator('h2').innerText(),'6 + 2 = ?');
  await masteryPage.locator('[data-answer]').nth(1).click();
