@@ -1,6 +1,6 @@
 import './style.css';
 import {questionsFor,recordAttempt,type Grade,type Question} from './learning.ts';
-import {loadState,saveState} from './storage.ts';
+import {loadState,saveStateIfUnchanged,STORAGE_KEY} from './storage.ts';
 import {isDue} from './review.ts';
 import {beginTutor,advanceTutor,type TutorSession} from './tutor.ts';
 import {concepts,masteryFromAttempts} from './mastery.ts';
@@ -46,10 +46,10 @@ function render(){
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',e=>{
   const n=Number((e.target as HTMLSelectElement).value) as Grade;
-  state={...state,grade:n};
-  const saved=saveState(localStorage,state);
-  chooseQuestion();
-  if(!saved)feedback='저장에 실패했어요. 브라우저 저장 공간을 확인해 주세요.';
+  const next={...state,grade:n};
+  const result=saveStateIfUnchanged(localStorage,state,next);
+  if(result==='saved'){state=next;chooseQuestion();}
+  else feedback=result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 시도해 주세요.':'저장에 실패했어요. 브라우저 저장 공간을 확인해 주세요.';
   render();
  });
  root.querySelector('#hint')?.addEventListener('click',()=>{if(!q||finished)return;usedHint=true;feedback=q.hint;render();});
@@ -63,16 +63,18 @@ function render(){
   if(correct){
    const next=recordAttempt(state,q,answer,usedHint||tutor.attempts>0,new Date());
    const gained=next.stars>state.stars;
-   const saved=saveState(localStorage,next);
+   const result=saveStateIfUnchanged(localStorage,state,next);
+   const saved=result==='saved';
    if(saved)state=next;
    finished=true;
-   feedback=saved?'정답이에요! '+(gained?'⭐ 별 1개 획득! ':'')+step.message:'정답이지만 저장에 실패했어요. 별과 학습 기록은 반영되지 않았어요.';
+   feedback=saved?'정답이에요! '+(gained?'⭐ 별 1개 획득! ':'')+step.message:result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 풀어 주세요.':'정답이지만 저장에 실패했어요. 별과 학습 기록은 반영되지 않았어요.';
   }else if(step.showExplanation){
    const next=recordAttempt(state,q,answer,true,new Date());
-   const saved=saveState(localStorage,next);
+   const result=saveStateIfUnchanged(localStorage,state,next);
+   const saved=result==='saved';
    if(saved)state=next;
    finished=true;
-   feedback=saved?step.message:'저장에 실패했어요. 학습 기록은 반영되지 않았어요.';
+   feedback=saved?step.message:result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 풀어 주세요.':'저장에 실패했어요. 학습 기록은 반영되지 않았어요.';
   }else{
    usedHint=true;
    feedback=step.message;
@@ -80,4 +82,10 @@ function render(){
   render();
  }));
 }
+window.addEventListener('storage',event=>{
+ if(event.key===STORAGE_KEY){
+  feedback='다른 탭에서 학습 기록이 변경됐어요. 최신 기록을 불러오려면 새로고침해 주세요.';
+  render();
+ }
+});
 render();
