@@ -41,6 +41,18 @@ try{
  await page.locator('.feedback').filter({hasText:/\S/}).waitFor({timeout:5000});
  console.log('PASS answer interaction for '+q);
  await page.close();
+ const context=await browser.newContext();
+ const tabA=await context.newPage(),tabB=await context.newPage();
+ const url='http://127.0.0.1:'+port+'/study_game/';
+ await tabA.goto(url);await tabB.goto(url);
+ await tabA.locator('#grade').selectOption('2');
+ await tabA.locator('.subject').filter({hasText:/2학년/}).waitFor();
+ await tabB.locator('#grade').selectOption('3');
+ await tabB.locator('.feedback').filter({hasText:/다른 탭에서 기록이 변경/}).waitFor();
+ await tabB.reload();
+ assert.equal(await tabB.locator('#grade').inputValue(),'2');
+ console.log('PASS stale-tab conflict and reload persistence');
+ await context.close();
 }finally{
  await browser?.close();
  server.kill();
