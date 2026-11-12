@@ -12,3 +12,13 @@ export function parseState(raw:string|null):GameState|null {
 }
 export function loadState(storage:Pick<Storage,'getItem'>,grade:Grade=1):GameState { try{return parseState(storage.getItem(STORAGE_KEY))??createState(grade);}catch{return createState(grade);} }
 export function saveState(storage:Pick<Storage,'setItem'>,state:GameState):boolean {try{storage.setItem(STORAGE_KEY,JSON.stringify(state));return true;}catch{return false;}}
+/** Best-effort stale-tab protection. This is not an atomic cross-tab transaction. */
+export function saveStateIfUnchanged(storage:Pick<Storage,'getItem'|'setItem'>,expected:GameState,next:GameState):'saved'|'conflict'|'error'{
+ try{
+  const current=parseState(storage.getItem(STORAGE_KEY));
+  if(current&&JSON.stringify(current)!==JSON.stringify(expected))return 'conflict';
+  if(!current&&storage.getItem(STORAGE_KEY)!==null)return 'conflict';
+  storage.setItem(STORAGE_KEY,JSON.stringify(next));
+  return 'saved';
+ }catch{return 'error';}
+}
