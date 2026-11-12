@@ -28,6 +28,10 @@ try{
   assert.match(await page.locator('.subject').innerText(),/2학년/);
   await page.locator('#hint').click();
   assert.ok((await page.locator('.feedback').innerText()).length>0);
+  const touchTargets=await page.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).map(el=>({label:el.textContent?.trim()||el.getAttribute('aria-label')||el.tagName,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
+  for(const target of touchTargets)assert.ok(target.width>=44&&target.height>=44,'small touch target at '+width+': '+JSON.stringify(target));
+  const clipped=await page.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).filter(el=>{const r=el.getBoundingClientRect();return r.left<0||r.right>innerWidth}).map(el=>el.textContent?.trim()));
+  assert.deepEqual(clipped,[],'clipped controls at '+width);
   await page.screenshot({path:'/tmp/p0b-'+width+'.png',fullPage:true});
   console.log('PASS viewport '+width);
   await page.close();
