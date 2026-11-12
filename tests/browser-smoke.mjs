@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
+import { mkdir } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 
 const port=4178;
@@ -15,6 +16,7 @@ async function waitForServer(){
 try{
  await waitForServer();
  browser=await chromium.launch({headless:true});
+ await mkdir('test-artifacts',{recursive:true});
  for(const width of [320,375,390,768]){
   const page=await browser.newPage({viewport:{width,height:780},deviceScaleFactor:1});
   await page.goto('http://127.0.0.1:'+port+'/study_game/');
@@ -32,7 +34,7 @@ try{
   for(const target of touchTargets)assert.ok(target.width>=44&&target.height>=44,'small touch target at '+width+': '+JSON.stringify(target));
   const clipped=await page.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).filter(el=>{const r=el.getBoundingClientRect();return r.left<0||r.right>innerWidth}).map(el=>el.textContent?.trim()));
   assert.deepEqual(clipped,[],'clipped controls at '+width);
-  await page.screenshot({path:'/tmp/p0b-'+width+'.png',fullPage:true});
+  await page.screenshot({path:'test-artifacts/p0b-'+width+'.png',fullPage:true});
   console.log('PASS viewport '+width);
   await page.close();
  }
