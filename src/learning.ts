@@ -39,6 +39,7 @@ export function recordAttempt(state: GameState, question: Question, response: st
   const correct=checkAnswer(question,response);
   const rating=ratingFor(correct,usedHint);
   const reviews={...state.reviews,[question.skillId]:scheduleReview(state.reviews[question.skillId],question.skillId,rating,at)};
-  return {...state,attempts:[...state.attempts,{questionId:question.id,skillId:question.skillId,correct,usedHint,at:at.toISOString()}],reviews,stars:state.stars+(correct?1:0)};
+  const firstIndependentCorrect=correct&&!usedHint&&!state.attempts.some(a=>a.questionId===question.id&&a.correct&&!a.usedHint);
+  return {...state,attempts:[...state.attempts,{questionId:question.id,skillId:question.skillId,correct,usedHint,at:at.toISOString()}],reviews,stars:state.stars+(firstIndependentCorrect?1:0)};
 }
 export function questionsFor(grade: Grade, subject?: Subject): Question[] { return [...questions,...variantQuestions].filter(q=>q.grade===grade && (!subject || q.subject===subject)); }
