@@ -1,6 +1,6 @@
 import './style.css';
 import {questionsFor,recordAttempt,type Grade,type Question} from './learning.ts';
-import {loadState,saveStateIfUnchanged,STORAGE_KEY} from './storage.ts';
+import {loadState,saveStateSafely,STORAGE_KEY} from './storage.ts';
 import {isDue} from './review.ts';
 import {beginTutor,advanceTutor,type TutorSession} from './tutor.ts';
 import {concepts,masteryFromAttempts} from './mastery.ts';
@@ -44,17 +44,17 @@ function render(){
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
- root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',e=>{
+ root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
   const n=Number((e.target as HTMLSelectElement).value) as Grade;
   const next={...state,grade:n};
-  const result=saveStateIfUnchanged(localStorage,state,next);
+  const result=await saveStateSafely(localStorage,state,next,navigator.locks);
   if(result==='saved'){state=next;chooseQuestion();}
   else feedback=result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 시도해 주세요.':'저장에 실패했어요. 브라우저 저장 공간을 확인해 주세요.';
   render();
  });
  root.querySelector('#hint')?.addEventListener('click',()=>{if(!q||finished)return;usedHint=true;feedback=q.hint;render();});
  root.querySelector('#next')?.addEventListener('click',()=>{chooseQuestion();render();});
- root.querySelectorAll<HTMLButtonElement>('[data-answer]').forEach(b=>b.addEventListener('click',()=>{
+ root.querySelectorAll<HTMLButtonElement>('[data-answer]').forEach(b=>b.addEventListener('click',async ()=>{
   if(!q||!tutor||finished)return;
   const answer=q.choices[Number(b.dataset.answer)];
   const correct=answer===q.answer;
@@ -63,14 +63,14 @@ function render(){
   if(correct){
    const next=recordAttempt(state,q,answer,usedHint||tutor.attempts>0,new Date());
    const gained=next.stars>state.stars;
-   const result=saveStateIfUnchanged(localStorage,state,next);
+   const result=await saveStateSafely(localStorage,state,next,navigator.locks);
    const saved=result==='saved';
    if(saved)state=next;
    finished=true;
    feedback=saved?'정답이에요! '+(gained?'⭐ 별 1개 획득! ':'')+step.message:result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 풀어 주세요.':'정답이지만 저장에 실패했어요. 별과 학습 기록은 반영되지 않았어요.';
   }else if(step.showExplanation){
    const next=recordAttempt(state,q,answer,true,new Date());
-   const result=saveStateIfUnchanged(localStorage,state,next);
+   const result=await saveStateSafely(localStorage,state,next,navigator.locks);
    const saved=result==='saved';
    if(saved)state=next;
    finished=true;
