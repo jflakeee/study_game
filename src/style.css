@@ -16,3 +16,6 @@ button,select{touch-action:manipulation}
 @media(prefers-reduced-motion:reduce){
  .choice:active{transform:none}
 }
+
+/* Ensure native grade selector meets the 44px mobile touch target. */
+.toolbar select{min-height:44px}
