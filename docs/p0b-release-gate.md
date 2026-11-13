@@ -9,11 +9,11 @@
 
 - Commit 4a434ff22c1f4ee31cc97ac136db5ff762ab851a: GitHub Actions run 43318016660 **success**. Chromium additionally verified independent correct reward persistence, hinted correct no reward, repeated-question no extra star, and mastery level 4 from two distinct independent correct question IDs.
 
-## Not yet verified / release blockers
+- Commit 7f8688b25f8d6b194893981740f385164391ddca: GitHub Actions run 43347614554 **success**. Chromium verified three-stage wrong-answer tutoring, explanation, no reward and saved failure record.\n- Commit 3b90043af32b5299c93e0c505a0a9b9fc1521cf3: GitHub Actions run 43347723835 **success**. Chromium verified legacy v1 grade, stars, attempts, mastery and review due date across reload.\n- Commit 3260fef3b1977b0e09ab8be67c8a8751eb3ef988: GitHub Actions run 43350253314 **success**. Chromium verified keyboard Tab/Enter, live-region attributes, and focus restoration after correct answers, hints and wrong-answer tutoring. No real screen-reader verification is claimed.\n\n## Not yet verified / release blockers
 - [ ] Human review of screenshots and hands-on touch behavior on physical iOS/Android devices.
 - [ ] Complete wrong-answer 1/2/3 progressive tutoring, explanation and no-reward behavior in a real browser.
 - [ ] Legacy v1 payload compatibility and full review schedule persistence in Chromium.
-- [ ] Keyboard navigation, screen-reader announcements and accessible focus.
+- [ ] Actual screen-reader announcements (NVDA/VoiceOver/TalkBack) and manual accessibility review; keyboard-only Chromium checks have passed.
 - [ ] Production P0-B preview URL and published Pages smoke test after explicit release approval.
 
 ## Known limitations
