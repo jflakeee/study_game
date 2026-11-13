@@ -47,6 +47,23 @@ try{
   console.log('PASS viewport '+width);
   await page.close();
  }
+ for(const [width,height] of [[667,375],[812,375]]){
+  const landscape=await browser.newPage({viewport:{width,height}});
+  await landscape.addInitScript(()=>{Math.random=()=>0;});
+  await landscape.goto('http://127.0.0.1:'+port+'/study_game/');
+  const overflow=await landscape.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
+  assert.ok(overflow.scroll<=overflow.client,'landscape horizontal overflow at '+width+'x'+height+': '+JSON.stringify(overflow));
+  const clipped=await landscape.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>el.scrollWidth>el.clientWidth+2||el.scrollHeight>el.clientHeight+2).map(el=>el.textContent?.trim().slice(0,60)));
+  assert.deepEqual(clipped,[],'landscape clipped content at '+width+'x'+height);
+  const targets=await landscape.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).map(el=>({label:el.textContent?.trim(),width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
+  for(const target of targets)assert.ok(target.width>=44&&target.height>=44,'landscape small target at '+width+'x'+height+': '+JSON.stringify(target));
+  await landscape.locator('[data-answer]').nth(1).focus();
+  await landscape.keyboard.press('Enter');
+  await landscape.locator('#next:focus').waitFor();
+  await landscape.screenshot({path:'test-artifacts/p0b-landscape-'+width+'x'+height+'.png',fullPage:true});
+  console.log('PASS landscape '+width+'x'+height);
+  await landscape.close();
+ }
  for(const scale of [1.5,2]){
   const enlarged=await browser.newPage({viewport:{width:320,height:780}});
   await enlarged.addInitScript(()=>{Math.random=()=>0;});
