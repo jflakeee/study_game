@@ -8,6 +8,14 @@
 - Test status: CI **PASS**; manual screenshot review, physical iOS/Android and assistive-technology checks **NOT RUN**.
 - Use the exact artifact above for manual test sessions. If a later commit is selected, update SHA, run and artifact URLs together before testing.
 
+## Latest candidate artifacts (2026-11-13)
+- Feature SHA: `2207fbd44c69685e805b169d9f51436c2a202ee1`
+- CI: https://github.com/jflakeee/study_game/actions/runs/43397218084 — **PASS**
+- Preview build artifact: https://github.com/jflakeee/study_game/actions/runs/43397218084/artifacts/14023298826 — available at inspection
+- Chromium screenshots: https://github.com/jflakeee/study_game/actions/runs/43397218084/artifacts/14023940480 — available at inspection, **not visually reviewed**
+- This replaces the older pinned candidate for new manual sessions. The artifact is a build archive, **not** a publicly accessible HTTPS preview deployment. A separately approved isolated HTTPS origin is required before real phones can test.
+- Actual iOS/Android execution, accessibility screen-reader verification and release approval: **NOT RUN / HOLD**.
+
 ## Preconditions
 1. Obtain explicit approval to use an isolated, non-production preview. Do not merge `feat/p0b-learning-engine` into `main` or overwrite public Pages.
 2. Download the isolated preview build from successful run https://github.com/jflakeee/study_game/actions/runs/43381108278 (artifact availability must be checked). Serve its built files on an HTTPS preview origin reachable by the devices; opening `index.html` as `file://` is not equivalent.
