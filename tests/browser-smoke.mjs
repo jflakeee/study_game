@@ -68,7 +68,7 @@ try{
  await rotated.addInitScript(()=>{Math.random=()=>0;});
  await rotated.goto('http://127.0.0.1:'+port+'/study_game/');
  await rotated.locator('[data-answer]').nth(1).click();
- await rotated.locator('#next').waitFor();
+ await rotated.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
  assert.match(await rotated.locator('.stars').innerText(),/1개/);
  for(const viewport of [{width:667,height:375},{width:375,height:667}]){
   await rotated.setViewportSize(viewport);
