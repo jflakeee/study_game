@@ -26,9 +26,9 @@
 | D07 | Switch grade, answer, reload | Selected grade and existing v1 progress remain consistent |
 | D08 | Open same preview in two tabs, modify one, then attempt stale-tab save | Clear conflict guidance; no silent loss or duplicate reward; reload recovers |
 | D09 | Deny or exhaust storage in disposable test environment | User-visible failure, no phantom reward, existing data not silently overwritten |
-| D10 | Use external keyboard Tab, Shift+Tab and Enter on answer/hint/next | Logical focus order, visible focus, no focus trap, focus preserved after feedback |
+| D10 | Use external keyboard Tab, Shift+Tab and Enter on answer/hint/next | Logical focus order, visible focus, no focus trap, focus preserved after feedback |\n| D11 | Rapidly double-tap the correct answer on a physical touchscreen; reload and inspect stars/attempts | Exactly one reward and one saved attempt, with no duplicate navigation |
 
-## Assistive technology — run separately
+## Automated double-submit baseline\n- Chromium double-click regression passed in CI https://github.com/jflakeee/study_game/actions/runs/43389002305 (commit `f009e8f677bab90fb360c9059ca1e84deade81e0`): one star, one attempt and reload persistence. Physical double-tap D11 remains **NOT RUN**.\n\n## Assistive technology — run separately
 - **A01 iOS VoiceOver:** Navigate question, answer choices, hint, feedback and next button by swipe. Confirm labels and reading order; record actual spoken feedback after correct, wrong and hinted answers.
 - **A02 Android TalkBack:** Repeat A01 with TalkBack; record whether the status message is announced without manual navigation.
 - **A03:** Repeat keyboard focus sequence with screen reader enabled if an external keyboard is available.
