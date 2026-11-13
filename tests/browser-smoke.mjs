@@ -201,6 +201,24 @@ try{
  assert.equal(await keyboardPage.locator('.feedback').getAttribute('aria-live'),'polite');
  console.log('PASS keyboard Tab/Enter answer interaction and feedback live-region semantics');
  await keyboardContext.close();
+ const tutorKeyboardContext=await browser.newContext();
+ await tutorKeyboardContext.addInitScript(()=>{Math.random=()=>0;});
+ const tutorKeyboardPage=await tutorKeyboardContext.newPage();
+ await tutorKeyboardPage.goto(url);
+ await tutorKeyboardPage.locator('#hint').focus();
+ await tutorKeyboardPage.keyboard.press('Enter');
+ await tutorKeyboardPage.locator('#hint:focus').waitFor();
+ await tutorKeyboardPage.locator('.feedback').filter({hasText:/4부터 세 칸 더 세어 보세요/}).waitFor();
+ await tutorKeyboardPage.locator('[data-answer="0"]').focus();
+ for(let i=0;i<2;i++){
+  await tutorKeyboardPage.keyboard.press('Enter');
+  await tutorKeyboardPage.locator('[data-answer="0"]:focus').waitFor();
+ }
+ await tutorKeyboardPage.keyboard.press('Enter');
+ await tutorKeyboardPage.locator('#next:focus').waitFor();
+ assert.match(await tutorKeyboardPage.locator('.stars').innerText(),/0개/);
+ console.log('PASS keyboard focus survives hint and two wrong answers, then advances to next on completion');
+ await tutorKeyboardContext.close();
 }finally{
  await browser?.close();
  server.kill();
