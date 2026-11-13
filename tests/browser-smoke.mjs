@@ -47,6 +47,18 @@ try{
   console.log('PASS viewport '+width);
   await page.close();
  }
+ for(const scale of [1.5,2]){
+  const enlarged=await browser.newPage({viewport:{width:320,height:780}});
+  await enlarged.goto('http://127.0.0.1:'+port+'/study_game/');
+  await enlarged.addStyleTag({content:`html{font-size:${16*scale}px!important}`});
+  const overflow=await enlarged.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
+  assert.ok(overflow.scroll<=overflow.client,'horizontal overflow at 320px with '+scale+'x root font: '+JSON.stringify(overflow));
+  const clipped=await enlarged.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>el.scrollWidth>el.clientWidth+2||el.scrollHeight>el.clientHeight+2).map(el=>el.textContent?.trim().slice(0,60)));
+  assert.deepEqual(clipped,[],'clipped content at 320px with '+scale+'x root font');
+  await enlarged.screenshot({path:'test-artifacts/p0b-text-'+scale+'x.png',fullPage:true});
+  console.log('PASS 320px enlarged root font '+scale+'x');
+  await enlarged.close();
+ }
  const page=await browser.newPage();
  await page.goto('http://127.0.0.1:'+port+'/study_game/');
  const q=await page.locator('.quiz').last().locator('h2').innerText();
