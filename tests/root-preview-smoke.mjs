@@ -26,8 +26,27 @@ try{
  assert.match(await page.locator('.stars').innerText(),/1개/);
  await page.reload();
  assert.match(await page.locator('.stars').innerText(),/1개/);
+ const hintPage=await browser.newPage();
+ await hintPage.addInitScript(()=>{Math.random=()=>0;});
+ await hintPage.goto('http://127.0.0.1:'+port+'/');
+ await hintPage.locator('#hint').click();
+ await hintPage.locator('[data-answer]').nth(1).click();
+ await hintPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
+ assert.match(await hintPage.locator('.stars').innerText(),/0개/);
+ await hintPage.reload();
+ assert.match(await hintPage.locator('.stars').innerText(),/0개/);
+ await hintPage.close();
+ const wrongPage=await browser.newPage();
+ await wrongPage.addInitScript(()=>{Math.random=()=>0;});
+ await wrongPage.goto('http://127.0.0.1:'+port+'/');
+ await wrongPage.locator('[data-answer]').first().click();
+ await wrongPage.locator('.feedback').filter({hasText:/\\S/}).waitFor();
+ assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
+ await wrongPage.reload();
+ assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
+ await wrongPage.close();
  assert.deepEqual(errors,[],'root preview console/network errors');
- console.log('PASS isolated root-path preview loads JS/CSS and interactive question without 404');
+ console.log('PASS root preview loads without errors; correct reward persists; hinted/wrong answers do not grant stars');
 }finally{
  await browser?.close();
  server.kill();
