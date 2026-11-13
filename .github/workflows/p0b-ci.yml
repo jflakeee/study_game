@@ -16,6 +16,18 @@ jobs:
       - run: npm install
       - run: npm test
       - run: npm run build
+      - name: Build isolated root-path preview and verify asset references
+        run: |
+          npm run build:preview
+          node --input-type=module -e "import {readFileSync} from 'node:fs'; import assert from 'node:assert/strict'; const html=readFileSync('dist/index.html','utf8'); assert.match(html,/src=\\\"\\/assets\\//); assert.match(html,/href=\\\"\\/assets\\//); assert.doesNotMatch(html,/\\/study_game\\/assets\\//); console.log('PASS root preview asset references');"
+      - name: Upload root-path preview build (not deployed)
+        uses: actions/upload-artifact@v4
+        with:
+          name: p0b-root-preview-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+      - run: npm run build
       - run: npx playwright install --with-deps chromium
       - name: Chromium browser smoke test
         timeout-minutes: 3
