@@ -40,7 +40,7 @@ try{
  await wrongPage.addInitScript(()=>{Math.random=()=>0;});
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
  await wrongPage.locator('[data-answer]').first().click();
- await wrongPage.locator('.feedback').filter({hasText:/\\S/}).waitFor();
+ await wrongPage.locator('.feedback').filter({hasText:/\S/}).waitFor();
  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
  await wrongPage.reload();
  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
