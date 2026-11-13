@@ -160,6 +160,29 @@ try{
  assert.equal(wrongSaved.stars,0);
  console.log('PASS three wrong answers show staged guidance and save no-star completion');
  await wrongContext.close();
+ const legacyContext=await browser.newContext();
+ await legacyContext.addInitScript(()=>{
+  localStorage.setItem('study-game-state-v1',JSON.stringify({
+   version:1,grade:3,stars:1,
+   attempts:[{questionId:'m3-div',skillId:'math.div.3',correct:true,usedHint:false,at:'2026-11-01T12:00:00.000Z'}],
+   reviews:{'math.div.3':{skillId:'math.div.3',repetitions:1,intervalDays:3,dueAt:'2099-01-01T00:00:00.000Z',lastRating:'good'}}
+  }));
+ });
+ const legacyPage=await legacyContext.newPage();
+ await legacyPage.goto(url);
+ assert.equal(await legacyPage.locator('#grade').inputValue(),'3');
+ assert.match(await legacyPage.locator('.stars').innerText(),/1개/);
+ assert.match(await legacyPage.locator('.village small').innerText(),/1문제 · 정답 1개/);
+ await legacyPage.locator('.quiz').filter({hasText:/오늘의 복습/}).getByText(/나눗셈 · 숙련도 3\/5/).waitFor();
+ const legacyBefore=await legacyPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.equal(legacyBefore.reviews['math.div.3'].dueAt,'2099-01-01T00:00:00.000Z');
+ await legacyPage.reload();
+ assert.equal(await legacyPage.locator('#grade').inputValue(),'3');
+ assert.match(await legacyPage.locator('.stars').innerText(),/1개/);
+ const legacyAfter=await legacyPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.deepEqual(legacyAfter,legacyBefore);
+ console.log('PASS legacy v1 state restores grade, stars, attempts, mastery and review schedule without migration');
+ await legacyContext.close();
 }finally{
  await browser?.close();
  server.kill();
