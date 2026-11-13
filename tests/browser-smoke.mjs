@@ -49,6 +49,7 @@ try{
  }
  for(const scale of [1.5,2]){
   const enlarged=await browser.newPage({viewport:{width:320,height:780}});
+  await enlarged.addInitScript(()=>{Math.random=()=>0;});
   await enlarged.goto('http://127.0.0.1:'+port+'/study_game/');
   await enlarged.addStyleTag({content:`html{font-size:${16*scale}px!important}`});
   const overflow=await enlarged.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
