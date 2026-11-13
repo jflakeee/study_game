@@ -22,6 +22,14 @@
 - Browser zoom / accessibility font sizing: add focused tests for a reproducible clipping defect; CSS root-font scaling alone does not emulate OS text settings.
 - Long-form Korean strings and screen-reader label changes: add stable regression cases after specific manual failures are documented.
 
+## Viewport rotation regression — 2026-11-13
+- First run https://github.com/jflakeee/study_game/actions/runs/43396358782 **FAILED**: assertion checked the star count before asynchronous save completed. This was a test synchronization issue, not demonstrated reward data loss.
+- Fix commit `4f764ef209954f5e5bb2f38a20971399fe2085c5` waits for the saved-reward feedback before checking stars.
+- Rerun https://github.com/jflakeee/study_game/actions/runs/43396482140 **PASSED**, including portrait → landscape → portrait viewport resizing and persisted reward after reload.
+- Matching preview artifact: https://github.com/jflakeee/study_game/actions/runs/43396482140/artifacts/14023297691
+- Matching screenshots: https://github.com/jflakeee/study_game/actions/runs/43396482140/artifacts/14022678130
+- Physical device orientation and screenshots remain **NOT RUN / NOT REVIEWED**.
+
 ## Manual verification order
 1. Human screenshot review for portrait, landscape, enlarged text, hint, correct and wrong states.
 2. Physical iOS Safari and Android Chrome scenarios D01–D10 from `docs/p0b-device-test-procedure.md`.
