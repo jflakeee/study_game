@@ -193,8 +193,13 @@ try{
  assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0');
  await keyboardPage.keyboard.press('Tab');
  assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'1');
+ await keyboardPage.keyboard.press('Shift+Tab');
+ assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0');
+ await keyboardPage.keyboard.press('Tab');
+ assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'1');
  await keyboardPage.keyboard.press('Enter');
  await keyboardPage.locator('#next:focus').waitFor();
+ await keyboardPage.screenshot({path:'test-artifacts/p0b-correct-complete.png',fullPage:true});
  await keyboardPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
  assert.match(await keyboardPage.locator('.stars').innerText(),/1개/);
  assert.equal(await keyboardPage.locator('.feedback').getAttribute('role'),'status');
@@ -208,6 +213,7 @@ try{
  await tutorKeyboardPage.locator('#hint').focus();
  await tutorKeyboardPage.keyboard.press('Enter');
  await tutorKeyboardPage.locator('#hint:focus').waitFor();
+ await tutorKeyboardPage.screenshot({path:'test-artifacts/p0b-hint.png',fullPage:true});
  await tutorKeyboardPage.locator('.feedback').filter({hasText:/4부터 세 칸 더 세어 보세요/}).waitFor();
  await tutorKeyboardPage.locator('[data-answer="0"]').focus();
  for(let i=0;i<2;i++){
@@ -216,6 +222,7 @@ try{
  }
  await tutorKeyboardPage.keyboard.press('Enter');
  await tutorKeyboardPage.locator('#next:focus').waitFor();
+ await tutorKeyboardPage.screenshot({path:'test-artifacts/p0b-wrong-complete.png',fullPage:true});
  assert.match(await tutorKeyboardPage.locator('.stars').innerText(),/0개/);
  console.log('PASS keyboard focus survives hint and two wrong answers, then advances to next on completion');
  await tutorKeyboardContext.close();
