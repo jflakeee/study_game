@@ -34,6 +34,15 @@ try{
   for(const target of touchTargets)assert.ok(target.width>=44&&target.height>=44,'small touch target at '+width+': '+JSON.stringify(target));
   const clipped=await page.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).filter(el=>{const r=el.getBoundingClientRect();return r.left<0||r.right>innerWidth}).map(el=>el.textContent?.trim()));
   assert.deepEqual(clipped,[],'clipped controls at '+width);
+  const textClipping=await page.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>{
+   const style=getComputedStyle(el);
+   if(style.display==='none'||style.visibility==='hidden')return false;
+   const rect=el.getBoundingClientRect();
+   const horizontal=el.scrollWidth>el.clientWidth+2;
+   const vertical=el.scrollHeight>el.clientHeight+2;
+   return rect.width>0&&rect.height>0&&(horizontal||vertical);
+  }).map(el=>({tag:el.tagName,text:el.textContent?.trim().slice(0,70),scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,scrollHeight:el.scrollHeight,clientHeight:el.clientHeight})));
+  assert.deepEqual(textClipping,[],'text clipping at '+width);
   await page.screenshot({path:'test-artifacts/p0b-'+width+'.png',fullPage:true});
   console.log('PASS viewport '+width);
   await page.close();
