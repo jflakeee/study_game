@@ -64,6 +64,23 @@ try{
   console.log('PASS landscape '+width+'x'+height);
   await landscape.close();
  }
+ const rotated=await browser.newPage({viewport:{width:375,height:667}});
+ await rotated.addInitScript(()=>{Math.random=()=>0;});
+ await rotated.goto('http://127.0.0.1:'+port+'/study_game/');
+ await rotated.locator('[data-answer]').nth(1).click();
+ await rotated.locator('#next').waitFor();
+ assert.match(await rotated.locator('.stars').innerText(),/1개/);
+ for(const viewport of [{width:667,height:375},{width:375,height:667}]){
+  await rotated.setViewportSize(viewport);
+  const metrics=await rotated.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
+  assert.ok(metrics.scroll<=metrics.client,'overflow after viewport rotation '+JSON.stringify(viewport));
+  assert.match(await rotated.locator('.stars').innerText(),/1개/);
+  await rotated.locator('#next').waitFor();
+ }
+ await rotated.reload();
+ assert.match(await rotated.locator('.stars').innerText(),/1개/);
+ console.log('PASS portrait-landscape-portrait resize preserves completed answer and persisted star');
+ await rotated.close();
  for(const scale of [1.5,2]){
   const enlarged=await browser.newPage({viewport:{width:320,height:780}});
   await enlarged.addInitScript(()=>{Math.random=()=>0;});
