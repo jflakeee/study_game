@@ -11,6 +11,13 @@
 - Latest isolated preview artifact: https://github.com/jflakeee/study_game/actions/runs/43379520186/artifacts/14016096818
 - Artifacts were uploaded and are currently available. They have not been manually reviewed or tested on physical devices.
 
+## Latest successful CI and evidence — 2026-11-13
+- Commit `e82bdb9bb4434bf1ef4bc593905ae219ba97ca77`: https://github.com/jflakeee/study_game/actions/runs/43390699760 — **success**.
+- Preview artifact: https://github.com/jflakeee/study_game/actions/runs/43390699760/artifacts/14020970854
+- Screenshot artifact: https://github.com/jflakeee/study_game/actions/runs/43390699760/artifacts/14020771410
+- Chromium rapid double-click regression passed in run 43389002305. Physical D11 double-tap still NOT RUN.
+- These are available build/screenshot artifacts, not an accessible deployed preview URL or evidence of physical-device testing.
+
 ## Manual evidence template
 Copy one row per verified environment. Do not mark PASS without reviewer/date and reproducible evidence.
 
@@ -23,7 +30,7 @@ Copy one row per verified environment. Do not mark PASS without reviewer/date an
 | Touch | Physical Android / Chrome | Hint, wrong x3, correct, next, rotate | Correct rewards and navigation | Not tested | NOT RUN | — | — |
 | Storage | Physical iPhone / Android | Reload v1 data; stale second tab; denied write | Data preserved or clear conflict/error | Not tested | NOT RUN | — | — |
 | Accessibility | iOS VoiceOver | Question/choices reading, feedback announcements, focus | Logical order and audible updates | Not tested | NOT RUN | — | — |
-| Accessibility | Android TalkBack | Question/choices reading, feedback announcements, focus | Logical order and audible updates | Not tested | NOT RUN | — | — |
+| Accessibility | Android TalkBack | Question/choices reading, feedback announcements, focus | Logical order and audible updates | Not tested | NOT RUN | — | — |\n| Touch | Physical iPhone / Android | D11 rapid double-tap correct answer, reload | One reward and one saved attempt | Not tested | NOT RUN | — | — |
 
 ## Defect record template
 - ID / severity (P0/P1/P2):
