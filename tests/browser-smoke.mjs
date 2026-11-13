@@ -140,6 +140,26 @@ try{
  assert.deepEqual(masterySaved.attempts.map(a=>a.questionId),['m1-add','m1-add-2']);
  console.log('PASS two distinct independent correct answers yield mastery 4 and two persisted stars');
  await masteryContext.close();
+ const wrongContext=await browser.newContext();
+ await wrongContext.addInitScript(()=>{Math.random=()=>0;});
+ const wrongPage=await wrongContext.newPage();
+ await wrongPage.goto(url);
+ assert.equal(await wrongPage.locator('.quiz').last().locator('h2').innerText(),'4 + 3 = ?');
+ await wrongPage.locator('[data-answer]').first().click();
+ await wrongPage.locator('.feedback').filter({hasText:/4부터 세 칸 더 세어 보세요/}).waitFor();
+ assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
+ await wrongPage.locator('[data-answer]').first().click();
+ await wrongPage.locator('.feedback').filter({hasText:/다른 방법으로 한 번 더 생각해 보세요/}).waitFor();
+ await wrongPage.locator('[data-answer]').first().click();
+ await wrongPage.locator('.feedback').filter({hasText:/4에서 5, 6, 7로 세 칸 이동해요/}).waitFor();
+ assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
+ assert.equal(await wrongPage.locator('[data-answer]:disabled').count(),3);
+ const wrongSaved=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.equal(wrongSaved.attempts.length,1);
+ assert.equal(wrongSaved.attempts[0].correct,false);
+ assert.equal(wrongSaved.stars,0);
+ console.log('PASS three wrong answers show staged guidance and save no-star completion');
+ await wrongContext.close();
 }finally{
  await browser?.close();
  server.kill();
