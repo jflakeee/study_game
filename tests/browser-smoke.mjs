@@ -194,6 +194,7 @@ try{
  await keyboardPage.keyboard.press('Tab');
  assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'1');
  await keyboardPage.keyboard.press('Enter');
+ await keyboardPage.locator('#next:focus').waitFor();
  await keyboardPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
  assert.match(await keyboardPage.locator('.stars').innerText(),/1개/);
  assert.equal(await keyboardPage.locator('.feedback').getAttribute('role'),'status');
