@@ -5,7 +5,11 @@
 - Last confirmed successful CI: https://github.com/jflakeee/study_game/actions/runs/43378134660 (commit `07113be756378bb87cd4d2d0d6398351591b28aa`).
 - Screenshots: https://github.com/jflakeee/study_game/actions/runs/43378134660/artifacts/14015457111
 - Isolated preview build: https://github.com/jflakeee/study_game/actions/runs/43378134660/artifacts/14014774659
-- Current release-gate documentation commit `aaf07d5`: https://github.com/jflakeee/study_game/actions/runs/43379445383 — status must be checked; no success claimed here.
+- Release-gate documentation commit `aaf07d5`: https://github.com/jflakeee/study_game/actions/runs/43379445383 — **success**.
+- Latest verification-record commit `46465cfbe15f0614817538cd3f5cdc55d4d68861`: https://github.com/jflakeee/study_game/actions/runs/43379520186 — **success**.
+- Latest screenshots artifact: https://github.com/jflakeee/study_game/actions/runs/43379520186/artifacts/14016231761
+- Latest isolated preview artifact: https://github.com/jflakeee/study_game/actions/runs/43379520186/artifacts/14016096818
+- Artifacts were uploaded and are currently available. They have not been manually reviewed or tested on physical devices.
 
 ## Manual evidence template
 Copy one row per verified environment. Do not mark PASS without reviewer/date and reproducible evidence.
