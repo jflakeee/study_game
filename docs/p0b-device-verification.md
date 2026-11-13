@@ -6,10 +6,10 @@
 - Isolated preview build artifact: https://github.com/jflakeee/study_game/actions/runs/43351206688/artifacts/14003123805
 - Screenshots and build artifacts were uploaded. No human screenshot review, physical-device run or public Pages deployment is claimed.
 
-## Visual review — pending
+- Successful expanded screenshot run: https://github.com/jflakeee/study_game/actions/runs/43353347160 (commit 1e53c008f76eae0ebc2378e650b4b594450373d4). Screenshots: https://github.com/jflakeee/study_game/actions/runs/43353347160/artifacts/14005181524; preview build: https://github.com/jflakeee/study_game/actions/runs/43353347160/artifacts/14005196434. Chromium now captures hint, correct-complete and three-wrong-complete states and verifies Shift+Tab reverse navigation. Screenshots remain unreviewed by a person.\n\n## Visual review — pending
 - [ ] Open each screenshot at native resolution; inspect header, toolbar, quiz, choices, hint, feedback, next button and footer.
 - [ ] Check text wrapping, overlap, clipped glyphs, spacing and contrast at 320, 375, 390 and 768 px.
-- [ ] Compare before/after answer and hint states; existing CI screenshots capture initial/hint state only, so additional manual screenshots may be needed.
+- [ ] Compare before/after answer and hint states; latest CI captures initial, hint, correct-complete and wrong-complete states; manual visual comparison remains pending.
 
 ## iOS Safari and Android Chrome — pending
 - [ ] Open an approved isolated preview on a physical iPhone and Android device (do not change production Pages before approval).
