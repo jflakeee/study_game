@@ -55,6 +55,12 @@ try{
   assert.ok(overflow.scroll<=overflow.client,'horizontal overflow at 320px with '+scale+'x root font: '+JSON.stringify(overflow));
   const clipped=await enlarged.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>el.scrollWidth>el.clientWidth+2||el.scrollHeight>el.clientHeight+2).map(el=>el.textContent?.trim().slice(0,60)));
   assert.deepEqual(clipped,[],'clipped content at 320px with '+scale+'x root font');
+  const targets=await enlarged.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).map(el=>({label:el.textContent?.trim(),width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
+  for(const target of targets)assert.ok(target.width>=44&&target.height>=44,'small target at '+scale+'x: '+JSON.stringify(target));
+  await enlarged.locator('[data-answer]').nth(1).focus();
+  await enlarged.keyboard.press('Enter');
+  await enlarged.locator('#next:focus').waitFor();
+  assert.match(await enlarged.locator('.stars').innerText(),/\b1개/);
   await enlarged.screenshot({path:'test-artifacts/p0b-text-'+scale+'x.png',fullPage:true});
   console.log('PASS 320px enlarged root font '+scale+'x');
   await enlarged.close();
