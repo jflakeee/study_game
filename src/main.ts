@@ -23,6 +23,9 @@ function chooseQuestion(){
 }
 function render(){
  if(!root)return;
+ const active=document.activeElement as HTMLElement|null;
+ const focusId=active?.id;
+ const focusAnswer=active?.getAttribute('data-answer');
  if(!selected)chooseQuestion();
  const q=selected;
  const answered=state.attempts.length;
@@ -45,6 +48,10 @@ function render(){
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
+ if(focusId==='hint'&&finished)root.querySelector<HTMLButtonElement>('#next')?.focus();
+ else if(focusAnswer!==null&&focusAnswer!==undefined&&finished)root.querySelector<HTMLButtonElement>('#next')?.focus();
+ else if(focusAnswer!==null&&focusAnswer!==undefined)root.querySelector<HTMLButtonElement>(`[data-answer="${focusAnswer}"]`)?.focus();
+ else if(focusId)root.querySelector<HTMLElement>(`#${focusId}`)?.focus();
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
   if(saving)return;
   saving=true;
