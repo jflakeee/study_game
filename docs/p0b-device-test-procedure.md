@@ -1,5 +1,13 @@
 # P0-B device test procedure — manual execution pending
 
+## Pinned test candidate (verified CI, not manually tested)
+- Feature commit: `f92a9c8d743d2f2844cbb59dc52cf991d1569d3e`
+- Successful GitHub Actions run: https://github.com/jflakeee/study_game/actions/runs/43382348307
+- Isolated preview build: https://github.com/jflakeee/study_game/actions/runs/43382348307/artifacts/14017451235
+- Chromium screenshot archive: https://github.com/jflakeee/study_game/actions/runs/43382348307/artifacts/14016987330
+- Test status: CI **PASS**; manual screenshot review, physical iOS/Android and assistive-technology checks **NOT RUN**.
+- Use the exact artifact above for manual test sessions. If a later commit is selected, update SHA, run and artifact URLs together before testing.
+
 ## Preconditions
 1. Obtain explicit approval to use an isolated, non-production preview. Do not merge `feat/p0b-learning-engine` into `main` or overwrite public Pages.
 2. Download the isolated preview build from successful run https://github.com/jflakeee/study_game/actions/runs/43381108278 (artifact availability must be checked). Serve its built files on an HTTPS preview origin reachable by the devices; opening `index.html` as `file://` is not equivalent.
