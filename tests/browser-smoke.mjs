@@ -183,6 +183,23 @@ try{
  assert.deepEqual(legacyAfter,legacyBefore);
  console.log('PASS legacy v1 state restores grade, stars, attempts, mastery and review schedule without migration');
  await legacyContext.close();
+ const keyboardContext=await browser.newContext();
+ await keyboardContext.addInitScript(()=>{Math.random=()=>0;});
+ const keyboardPage=await keyboardContext.newPage();
+ await keyboardPage.goto(url);
+ await keyboardPage.keyboard.press('Tab');
+ assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.id),'grade');
+ await keyboardPage.keyboard.press('Tab');
+ assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0');
+ await keyboardPage.keyboard.press('Tab');
+ assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'1');
+ await keyboardPage.keyboard.press('Enter');
+ await keyboardPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
+ assert.match(await keyboardPage.locator('.stars').innerText(),/1개/);
+ assert.equal(await keyboardPage.locator('.feedback').getAttribute('role'),'status');
+ assert.equal(await keyboardPage.locator('.feedback').getAttribute('aria-live'),'polite');
+ console.log('PASS keyboard Tab/Enter answer interaction and feedback live-region semantics');
+ await keyboardContext.close();
 }finally{
  await browser?.close();
  server.kill();
