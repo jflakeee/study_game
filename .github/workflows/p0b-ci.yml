@@ -20,6 +20,10 @@ jobs:
         run: |
           npm run build:preview
           node --input-type=module -e "import {readFileSync} from 'node:fs'; import assert from 'node:assert/strict'; const html=readFileSync('dist/index.html','utf8'); assert.match(html,/src=\\\"\\/assets\\//); assert.match(html,/href=\\\"\\/assets\\//); assert.doesNotMatch(html,/\\/study_game\\/assets\\//); console.log('PASS root preview asset references');"
+      - run: npx playwright install --with-deps chromium
+      - name: Chromium root-path preview smoke test
+        timeout-minutes: 3
+        run: node tests/root-preview-smoke.mjs
       - name: Upload root-path preview build (not deployed)
         uses: actions/upload-artifact@v4
         with:
