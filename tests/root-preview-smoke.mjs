@@ -62,6 +62,16 @@ try{
  await gradePage.reload();
  assert.equal(await gradePage.locator('#grade').inputValue(),'2','selected grade must survive reload');
  await gradePage.close();
+ const nextPage=await browser.newPage();
+ await nextPage.goto('http://127.0.0.1:'+port+'/');
+ await nextPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
+ await nextPage.locator('#next').focus();
+ await nextPage.keyboard.press('Enter');
+ await nextPage.locator('#next:focus').waitFor();
+ assert.equal(await nextPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after skipping to another question');
+ assert.equal(await nextPage.locator('[data-answer]:not([disabled])').count(),3,'next question must have enabled answers');
+ assert.equal(await nextPage.locator('.feedback').innerText(),'','new question must clear prior feedback');
+ await nextPage.close();
  const wrongPage=await browser.newPage();
  await wrongPage.addInitScript(()=>{Math.random=()=>0;});
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
