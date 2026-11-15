@@ -31,9 +31,15 @@ try{
  const hintPage=await browser.newPage();
  await hintPage.addInitScript(()=>{Math.random=()=>0;});
  await hintPage.goto('http://127.0.0.1:'+port+'/');
- await hintPage.locator('#hint').click();
- await hintPage.locator('[data-answer]').nth(1).click();
+ await hintPage.locator('#hint').focus();
+ await hintPage.keyboard.press('Enter');
+ await hintPage.locator('#hint:focus').waitFor();
+ await hintPage.locator('.feedback').filter({hasText:/./}).waitFor();
+ await hintPage.locator('[data-answer]').nth(1).focus();
+ await hintPage.keyboard.press('Enter');
  await hintPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
+ await hintPage.locator('#next:focus').waitFor();
+ assert.equal(await hintPage.locator('[data-answer]:not([disabled])').count(),0);
  assert.match(await hintPage.locator('.stars').innerText(),/0개/);
  const hinted=await hintPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
  assert.equal(hinted.stars,0);
