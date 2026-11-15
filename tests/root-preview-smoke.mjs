@@ -13,10 +13,12 @@ try{
  }
  assert.ok(ready,'root-path preview did not start');
  browser=await chromium.launch({headless:true});
- const page=await browser.newPage();
  const errors=[];
- page.on('pageerror',error=>errors.push(error.message));
- page.on('response',response=>{if(response.status()>=400)errors.push(response.status()+' '+response.url());});
+ browser.on('context',context=>context.on('page',page=>{
+  page.on('pageerror',error=>errors.push(error.message));
+  page.on('response',response=>{if(response.status()>=400)errors.push(response.status()+' '+response.url());});
+ }));
+ const page=await browser.newPage();
  await page.addInitScript(()=>{Math.random=()=>0;});
  await page.goto('http://127.0.0.1:'+port+'/');
  await page.locator('h1').filter({hasText:/지식 탐험대/}).waitFor();
@@ -33,6 +35,9 @@ try{
  await hintPage.locator('[data-answer]').nth(1).click();
  await hintPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
  assert.match(await hintPage.locator('.stars').innerText(),/0개/);
+ const hinted=await hintPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.equal(hinted.stars,0);
+ assert.equal(hinted.attempts.length,1,'hinted answer must persist one attempt');
  await hintPage.reload();
  assert.match(await hintPage.locator('.stars').innerText(),/0개/);
  await hintPage.close();
@@ -42,6 +47,9 @@ try{
  await wrongPage.locator('[data-answer]').first().click();
  await wrongPage.locator('.feedback').filter({hasText:/\S/}).waitFor();
  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
+ const wrong=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.equal(wrong.stars,0);
+ assert.equal(wrong.attempts.length,1,'incorrect answer must persist one attempt');
  await wrongPage.reload();
  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
  await wrongPage.close();
