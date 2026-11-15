@@ -57,8 +57,13 @@ try{
  const wrong=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
  assert.equal(wrong.stars,0);
  assert.equal(wrong.attempts.length,1,'third wrong answer must persist one attempt');
+ assert.equal(wrong.attempts[0].correct,false,'third wrong answer must be recorded as incorrect');
+ assert.equal(wrong.attempts[0].usedHint,true,'tutored incorrect attempt must record hint usage');
  await wrongPage.reload();
  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
+ const persistedWrong=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.equal(persistedWrong.attempts.length,1,'incorrect attempt must survive reload');
+ assert.equal(persistedWrong.attempts[0].correct,false);
  await wrongPage.close();
  assert.deepEqual(errors,[],'root preview console/network errors');
  console.log('PASS root preview loads without errors; correct reward persists; hinted/wrong answers do not grant stars');
