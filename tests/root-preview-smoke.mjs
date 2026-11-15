@@ -46,7 +46,7 @@ try{
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
  for(let attempt=1;attempt<=3;attempt++){
   await wrongPage.locator('[data-answer]').first().click();
-  if(attempt===1)await wrongPage.locator('.feedback').filter({hasText:/\\S/}).waitFor();
+  if(attempt===1)await wrongPage.locator('.feedback').filter({hasText:/./}).waitFor();
   if(attempt===2)await wrongPage.locator('.feedback').filter({hasText:/다른 방법으로/}).waitFor();
   if(attempt===3)await wrongPage.locator('#next').filter({hasText:/다음 문제로/}).waitFor();
   assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
