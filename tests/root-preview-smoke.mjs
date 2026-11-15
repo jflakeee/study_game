@@ -53,6 +53,7 @@ try{
  const wrongPage=await browser.newPage();
  await wrongPage.addInitScript(()=>{Math.random=()=>0;});
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
+ await wrongPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
  for(let attempt=1;attempt<=3;attempt++){
   await wrongPage.locator('[data-answer]').first().click();
   if(attempt===1)await wrongPage.locator('.feedback').filter({hasText:/./}).waitFor();
@@ -64,6 +65,7 @@ try{
   }else{
    await wrongPage.locator('[data-answer="0"]:focus').waitFor();
   }
+  assert.equal(await wrongPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist across incorrect answer stage '+attempt);
   assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
   const saved=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
   if(attempt<3)assert.equal(saved,null,'early wrong answer should not persist an attempt');
