@@ -38,6 +38,7 @@ function render(){
   return {concept:item,level:mastery?.level??0,due:isDue(review,new Date()),dueAt:review?.dueAt};
  });
  const dueCount=progress.filter(p=>p.due).length;
+ const existingFeedback=root.querySelector<HTMLElement>('.feedback');
  root.innerHTML=`<div class="shell"><header><div class="eyebrow">STUDY GAME · P0-B</div><h1>🌱 지식 탐험대</h1><p>스스로 생각하고 마을을 키워요!</p></header>
  <section class="toolbar"><label for="grade">학년 선택</label><select id="grade">${[1,2,3].map(n=>`<option value="${n}" ${state.grade===n?'selected':''}>${n}학년</option>`).join('')}</select><span class="stars" aria-live="polite">⭐ ${state.stars}개</span></section>
  <section class="village" aria-label="마을 성장"><div class="land">🏡 ${'🌳'.repeat(Math.min(8,Math.floor(state.stars/2)))}${state.stars>=4?'🏫':''}</div><small>학습 기록: ${answered}문제 · 정답 ${success}개</small></section>
@@ -48,6 +49,10 @@ function render(){
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
+ if(existingFeedback){
+  const replacement=root.querySelector<HTMLElement>('.feedback');
+  if(replacement){replacement.replaceWith(existingFeedback);existingFeedback.textContent=feedback;}
+ }
  if(focusId==='hint'&&finished)root.querySelector<HTMLButtonElement>('#next')?.focus();
  else if(focusAnswer!==null&&focusAnswer!==undefined&&finished)root.querySelector<HTMLButtonElement>('#next')?.focus();
  else if(focusAnswer!==null&&focusAnswer!==undefined)root.querySelector<HTMLButtonElement>(`[data-answer="${focusAnswer}"]`)?.focus();
