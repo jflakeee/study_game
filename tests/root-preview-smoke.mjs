@@ -48,7 +48,13 @@ try{
   await wrongPage.locator('[data-answer]').first().click();
   if(attempt===1)await wrongPage.locator('.feedback').filter({hasText:/./}).waitFor();
   if(attempt===2)await wrongPage.locator('.feedback').filter({hasText:/다른 방법으로/}).waitFor();
-  if(attempt===3)await wrongPage.locator('#next').filter({hasText:/다음 문제로/}).waitFor();
+  if(attempt===3){
+   await wrongPage.locator('#next').filter({hasText:/다음 문제로/}).waitFor();
+   await wrongPage.locator('#next:focus').waitFor();
+   assert.equal(await wrongPage.locator('[data-answer]:not([disabled])').count(),0,'answers must be disabled after final incorrect attempt');
+  }else{
+   await wrongPage.locator('[data-answer="0"]:focus').waitFor();
+  }
   assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
   const saved=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
   if(attempt<3)assert.equal(saved,null,'early wrong answer should not persist an attempt');
