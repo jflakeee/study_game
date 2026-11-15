@@ -46,7 +46,7 @@ try{
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
  await wrongPage.locator('[data-answer]').first().click();
  await wrongPage.locator('.feedback').filter({hasText:/\S/}).waitFor();
- await wrongPage.waitForFunction(()=>{const saved=localStorage.getItem('study-game-state-v1');return saved!==null&&JSON.parse(saved).attempts.length===1;},{timeout:5000});
+ await wrongPage.waitForFunction(()=>{const saved=localStorage.getItem('study-game-state-v1');return saved!==null&&JSON.parse(saved).attempts.length===1;},null,{timeout:5000});
  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
  const wrong=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
  assert.equal(wrong.stars,0);
