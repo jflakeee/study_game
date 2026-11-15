@@ -50,6 +50,18 @@ try{
  await hintPage.reload();
  assert.match(await hintPage.locator('.stars').innerText(),/0개/);
  await hintPage.close();
+ const gradePage=await browser.newPage();
+ await gradePage.goto('http://127.0.0.1:'+port+'/');
+ await gradePage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
+ await gradePage.locator('#grade').focus();
+ await gradePage.locator('#grade').selectOption('2');
+ await gradePage.waitForFunction(()=>JSON.parse(localStorage.getItem('study-game-state-v1')||'null')?.grade===2);
+ await gradePage.locator('#grade:focus').waitFor();
+ assert.equal(await gradePage.locator('#grade').inputValue(),'2','selected grade must remain visible');
+ assert.equal(await gradePage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after grade change');
+ await gradePage.reload();
+ assert.equal(await gradePage.locator('#grade').inputValue(),'2','selected grade must survive reload');
+ await gradePage.close();
  const wrongPage=await browser.newPage();
  await wrongPage.addInitScript(()=>{Math.random=()=>0;});
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
