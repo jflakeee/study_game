@@ -31,13 +31,16 @@ try{
  const hintPage=await browser.newPage();
  await hintPage.addInitScript(()=>{Math.random=()=>0;});
  await hintPage.goto('http://127.0.0.1:'+port+'/');
+ await hintPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
  await hintPage.locator('#hint').focus();
  await hintPage.keyboard.press('Enter');
  await hintPage.locator('#hint:focus').waitFor();
  await hintPage.locator('.feedback').filter({hasText:/./}).waitFor();
+ assert.equal(await hintPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after hint');
  await hintPage.locator('[data-answer]').nth(1).focus();
  await hintPage.keyboard.press('Enter');
  await hintPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
+ assert.equal(await hintPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after answer');
  await hintPage.locator('#next:focus').waitFor();
  assert.equal(await hintPage.locator('[data-answer]:not([disabled])').count(),0);
  assert.match(await hintPage.locator('.stars').innerText(),/0개/);
