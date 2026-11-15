@@ -44,13 +44,19 @@ try{
  const wrongPage=await browser.newPage();
  await wrongPage.addInitScript(()=>{Math.random=()=>0;});
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
- await wrongPage.locator('[data-answer]').first().click();
- await wrongPage.locator('.feedback').filter({hasText:/\S/}).waitFor();
+ for(let attempt=1;attempt<=3;attempt++){
+  await wrongPage.locator('[data-answer]').first().click();
+  if(attempt===1)await wrongPage.locator('.feedback').filter({hasText:/\\S/}).waitFor();
+  if(attempt===2)await wrongPage.locator('.feedback').filter({hasText:/다른 방법으로/}).waitFor();
+  if(attempt===3)await wrongPage.locator('#next').filter({hasText:/다음 문제로/}).waitFor();
+  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
+  const saved=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+  if(attempt<3)assert.equal(saved,null,'early wrong answer should not persist an attempt');
+ }
  await wrongPage.waitForFunction(()=>{const saved=localStorage.getItem('study-game-state-v1');return saved!==null&&JSON.parse(saved).attempts.length===1;},null,{timeout:5000});
- assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
  const wrong=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
  assert.equal(wrong.stars,0);
- assert.equal(wrong.attempts.length,1,'incorrect answer must persist one attempt');
+ assert.equal(wrong.attempts.length,1,'third wrong answer must persist one attempt');
  await wrongPage.reload();
  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
  await wrongPage.close();
