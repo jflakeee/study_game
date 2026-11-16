@@ -79,6 +79,15 @@ try{
  assert.equal(await nextPage.locator('[data-answer]:not([disabled])').count(),3,'next question must have enabled answers');
  assert.equal(await nextPage.locator('.feedback').innerText(),'','new question must clear prior feedback');
  await nextPage.close();
+ const conflictPage=await browser.newPage();
+ await conflictPage.goto('http://127.0.0.1:'+port+'/');
+ await conflictPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
+ await conflictPage.locator('#hint').focus();
+ await conflictPage.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:'study-game-state-v1',newValue:'{}'})));
+ await conflictPage.locator('.feedback').filter({hasText:/다른 탭에서 학습 기록이 변경됐어요/}).waitFor();
+ await conflictPage.locator('#hint:focus').waitFor();
+ assert.equal(await conflictPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after cross-tab storage notice');
+ await conflictPage.close();
  const wrongPage=await browser.newPage();
  await wrongPage.addInitScript(()=>{Math.random=()=>0;});
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
