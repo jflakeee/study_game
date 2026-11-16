@@ -26,6 +26,13 @@ try{
  await page.locator('[data-answer]').nth(1).click();
  await page.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
  assert.match(await page.locator('.stars').innerText(),/1개/);
+ await page.locator('#next').filter({hasText:/다음 문제로/}).waitFor();
+ await page.locator('#next').focus();
+ await page.keyboard.press('Enter');
+ await page.locator('#next:focus').waitFor();
+ assert.equal(await page.locator('[data-answer]:not([disabled])').count(),3,'answers must be enabled for the new question');
+ assert.equal(await page.locator('.feedback').innerText(),'','completed question feedback must clear when advancing');
+ assert.match(await page.locator('.stars').innerText(),/1개/);
  await page.reload();
  assert.match(await page.locator('.stars').innerText(),/1개/);
  const hintPage=await browser.newPage();
