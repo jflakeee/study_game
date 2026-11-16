@@ -102,7 +102,8 @@ try{
  assert.equal(await reader.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'real cross-tab change must preserve live feedback node');
  assert.equal(await reader.locator('#grade').inputValue(),'1','stale tab must not silently overwrite its visible grade');
  await reader.locator('[data-answer]').nth(1).click();
- await reader.locator('.feedback').filter({hasText:/다른 탭에서 기록이 변경됐어요/}).waitFor();
+ await reader.waitForFunction(()=>document.querySelector('.feedback')?.textContent?.includes('새로고침 후 다시 풀어 주세요.')||document.querySelector('.feedback')?.textContent?.includes('저장에 실패했어요.'),null,{timeout:5000});
+ assert.match(await reader.locator('.feedback').innerText(),/다른 탭에서 기록이 변경됐어요/,'stale write must be rejected with a conflict notice');
  assert.equal(await reader.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')).grade),2,'stale answer must not overwrite newer grade');
  assert.equal(await reader.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')).attempts.length),0,'stale answer must not append an attempt');
  await reader.reload();
