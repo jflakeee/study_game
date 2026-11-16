@@ -103,6 +103,12 @@ try{
  const wrong=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
  assert.equal(wrong.stars,0);
  assert.equal(wrong.attempts.length,1,'third wrong answer must persist one attempt');
+ await wrongPage.locator('#next').focus();
+ await wrongPage.keyboard.press('Enter');
+ await wrongPage.locator('#next:focus').waitFor();
+ assert.equal(await wrongPage.locator('[data-answer]:not([disabled])').count(),3,'new question must enable choices after three wrong answers');
+ assert.equal(await wrongPage.locator('.feedback').innerText(),'','wrong-answer explanation must clear when advancing');
+ assert.equal(await wrongPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'feedback live region must survive advancing from wrong answer');
  assert.equal(wrong.attempts[0].correct,false,'third wrong answer must be recorded as incorrect');
  assert.equal(wrong.attempts[0].usedHint,true,'tutored incorrect attempt must record hint usage');
  await wrongPage.reload();
