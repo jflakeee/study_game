@@ -34,3 +34,5 @@ button,select{touch-action:manipulation}
  .hint,.next{margin-top:10px}
  footer{margin-top:16px}
 }
+
+.village-progress{display:grid;gap:4px;max-width:240px;margin:6px auto;font-size:.85rem;color:#315b37}.village-progress progress{width:100%;height:10px;accent-color:#347b45}.village strong{color:#25492b}
