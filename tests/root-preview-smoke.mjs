@@ -16,6 +16,8 @@ try{
  const errors=[];
  const track=page=>{
   page.on('pageerror',error=>errors.push(error.message));
+  page.on('console',message=>{if(message.type()==='error')errors.push(message.text());});
+  page.on('requestfailed',request=>errors.push((request.failure()?.errorText??'request failed')+' '+request.url()));
   page.on('response',response=>{if(response.status()>=400)errors.push(response.status()+' '+response.url());});
   return page;
  };
