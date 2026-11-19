@@ -313,6 +313,24 @@ try{
  await miniPage.locator('.expedition-status').filter({hasText:'0/3'}).waitFor();
  assert.match(await miniPage.locator('.stars').innerText(),/2개/);
  await miniPage.close();
+ const recoveryContext=await browser.newContext();
+ await recoveryContext.addInitScript(()=>{Math.random=()=>0;});
+ const writer=track(await recoveryContext.newPage());
+ const reader=track(await recoveryContext.newPage());
+ await writer.goto('http://127.0.0.1:'+port+'/');
+ await reader.goto('http://127.0.0.1:'+port+'/');
+ await writer.locator('[data-answer]').nth(1).click();
+ await writer.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
+ await reader.locator('#reload-records').waitFor();
+ const raw=await writer.evaluate(()=>localStorage.getItem('study-game-state-v1'));
+ await reader.locator('[data-answer]').nth(1).click();
+ await reader.locator('.feedback').filter({hasText:/다른 탭/}).waitFor();
+ assert.equal(await writer.evaluate(()=>localStorage.getItem('study-game-state-v1')),raw);
+ await reader.locator('#reload-records').click();
+ await reader.waitForLoadState('load');
+ await reader.locator('.stars').filter({hasText:'1개'}).waitFor();
+ assert.equal(await reader.locator('#reload-records').count(),0);
+ await recoveryContext.close();
  assert.deepEqual(errors,[],'root preview console/network errors');
  console.log('PASS root preview loads without errors; correct reward persists; hinted/wrong answers do not grant stars');
 }finally{
