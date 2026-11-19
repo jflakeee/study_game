@@ -51,3 +51,19 @@ button,select{touch-action:manipulation}
 
 /* P2: storybook quest panel */
 .toolbar{flex-wrap:wrap}.toolbar #sound{margin:0;font-size:.85rem;min-height:44px;padding:8px 10px}.quest{background:#fffdf6;border:2px solid #e8d8b2;box-shadow:0 5px 0 #e7dbbf,0 10px 24px #6b8aa41c}.quest-kicker{font-size:.78rem;font-weight:800;letter-spacing:.08em;color:#80602d;margin-bottom:6px}.quest .subject{display:inline-block;background:#e4f0df;color:#315b37;border-radius:10px;padding:6px 10px;font-size:.9rem}.quest h2{color:#344259;line-height:1.5}.quest .choice{background:#fff;border:2px solid #bfd2e0;border-bottom:4px solid #a5c1d5;border-radius:14px;min-height:56px;padding:10px}.quest .choice:disabled{opacity:.75}.quest .hint{border:1px solid #dfc67f;color:#624915}.quest .next{background:#2266a4;border-bottom:3px solid #174c7c;min-height:52px}.quest .feedback:not(:empty){background:#edf5e8;border-radius:10px;padding:10px;line-height:1.6}.quest .feedback:empty{min-height:12px}
+
+/* P2: landscape uses available width without changing reading or tab order. */
+@media (orientation:landscape) and (min-width:650px) and (max-height:500px){
+ .shell{max-width:1000px;padding:10px 14px 24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:10px;align-items:start}
+ .shell>header,.shell>.toolbar,.shell>footer{grid-column:1/-1}
+ .shell>.village{grid-column:1;grid-row:3}
+ .shell>.quiz:not(.quest){grid-column:1;grid-row:4}
+ .shell>.quest{grid-column:2;grid-row:3/span 2;align-self:start}
+ .shell>.toolbar,.shell>.village,.shell>.quiz,.shell>footer{margin:0;min-width:0}
+ .shell>header h1{font-size:clamp(24px,4vw,32px);margin:4px 0}
+ .shell>header p{margin:4px 0}
+ .shell>.village,.shell>.quiz{padding:14px}
+ .village-art{max-width:260px}
+ .quest h2{min-height:0;margin:8px 0 12px}
+ .choices{gap:8px}
+}
