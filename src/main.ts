@@ -17,6 +17,7 @@ let finished=false;
 let saving=false;
 let sessionCompleted=0;
 let selectedBuilding=0;
+let selectedRegion=0;
 let villageSlots:(number|null)[]=Array(6).fill(null);
 let previousSlots:(number|null)[]|null=null;
 const buildingIcons=['🏡','🌳','🏫','📚','🏛️','🌷','🎡','🗼','🚩'];
@@ -59,6 +60,8 @@ function render(){
  const stageIndex=stages.reduce((index,stage,i)=>state.stars>=stage.stars?i:index,0);
  const grew=renderedVillageStage!==undefined&&stageIndex>renderedVillageStage;
  renderedVillageStage=stageIndex;
+ const worldOpen=root.querySelector<HTMLDetailsElement>('#world-map')?.open??false;
+ selectedRegion=Math.min(selectedRegion,stageIndex);
  const journalOpen=root.querySelector<HTMLDetailsElement>('#village-journal')?.open??false;
  selectedBuilding=Math.min(selectedBuilding,stageIndex);
  const discoveries=['작은 집','푸른 나무','학교','도서관','시청','꽃 정원','풍차','별빛 탑','왕국 깃발'];
@@ -78,6 +81,7 @@ function render(){
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
  <details id="village-journal" class="quiz village-journal" ${journalOpen?'open':''}><summary id="journal-toggle">마을 수집 도감 · ${stageIndex+1}/${stages.length}</summary><ol>${stages.map((item,i)=>`<li class="${i<=stageIndex?'discovered':'undiscovered'}"><strong>${i<=stageIndex?'✓ '+discoveries[i]:'🔒 '+discoveries[i]}</strong><small>${item.name} · 별 ${item.stars}개</small><p class="discovery-story">${i<=stageIndex?stories[i]:'마을이 성장하면 새 이야기가 열려요.'}</p><button type="button" class="building-select" id="building-${i}" data-building="${i}" aria-pressed="${selectedBuilding===i}" ${i>stageIndex?'disabled':''}>${i>stageIndex?'잠김':selectedBuilding===i?'선택됨':'선택하기'}</button></li>`).join('')}</ol><p class="building-preview" role="status">선택한 건축물: ${discoveries[selectedBuilding]} · 빈 칸이나 건물을 눌러 배치해요.</p><div class="building-slots" aria-label="나만의 마을">${villageSlots.map((building,i)=>`<button type="button" id="slot-${i}" data-slot="${i}" aria-label="${i+1}번 자리: ${building===null?'빈 칸':discoveries[building]}">${building===null?'＋':buildingIcons[building]}<small>${building===null?'빈 칸':discoveries[building]}</small></button>`).join('')}</div><div class="building-actions"><button type="button" id="building-undo" ${previousSlots?'':'disabled'}>되돌리기</button><button type="button" id="building-reset" ${villageSlots.every(v=>v===null)?'disabled':''}>비우기</button></div></details>
+ <details id="world-map" class="quiz world-map" ${worldOpen?'open':''}><summary id="world-toggle">🗺️ 지식 왕국 탐험 · ${stageIndex+1}/${stages.length}</summary><ol class="world-route">${stages.map((item,i)=>`<li><button type="button" id="region-${i}" data-region="${i}" aria-pressed="${selectedRegion===i}" ${i>stageIndex?'disabled':''}><span aria-hidden="true">${i>stageIndex?'🔒':buildingIcons[i]}</span><strong>${item.name}</strong><small>${i>stageIndex?'별 '+item.stars+'개에 해금':'탐험 가능'}</small></button></li>`).join('')}</ol><div class="region-story" role="status"><strong>${stages[selectedRegion].name}</strong><p>${stories[selectedRegion]}</p></div></details>
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
  if(preserveLand&&existingLand){existingLand.classList.remove('village-grown');root.querySelector('.land')?.replaceWith(existingLand);}
  if(existingFeedback){
@@ -101,6 +105,7 @@ function render(){
   render();
  });
  root.querySelector('#hint')?.addEventListener('click',()=>{if(!q||finished||saving)return;usedHint=true;feedback=q.hint;render();});
+ root.querySelectorAll<HTMLButtonElement>('[data-region]').forEach(button=>button.addEventListener('click',()=>{const index=Number(button.dataset.region);if(saving||!Number.isInteger(index)||index<0||index>stageIndex)return;selectedRegion=index;render();}));
  root.querySelectorAll<HTMLButtonElement>('[data-building]').forEach(button=>button.addEventListener('click',()=>{const index=Number(button.dataset.building);if(saving||!Number.isInteger(index)||index<0||index>stageIndex)return;selectedBuilding=index;render();}));
  root.querySelectorAll<HTMLButtonElement>('[data-slot]').forEach(button=>button.addEventListener('click',()=>{const i=Number(button.dataset.slot);if(saving||!Number.isInteger(i)||i<0||i>=villageSlots.length||selectedBuilding>stageIndex||villageSlots[i]===selectedBuilding)return;previousSlots=[...villageSlots];villageSlots[i]=selectedBuilding;render();}));
  root.querySelector('#building-undo')?.addEventListener('click',()=>{if(saving||!previousSlots)return;villageSlots=previousSlots;previousSlots=null;render();root.querySelector<HTMLElement>('#slot-0')?.focus();});
