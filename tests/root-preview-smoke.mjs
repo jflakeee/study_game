@@ -223,6 +223,26 @@ try{
  assert.equal(persistedWrong.attempts[0].correct,false);
  assert.equal(persistedWrong.attempts[1].correct,true);
  await wrongPage.close();
+ const growthPage=track(await browser.newPage({viewport:{width:320,height:720},reducedMotion:'reduce'}));
+ await growthPage.addInitScript(()=>{Math.random=()=>0;});
+ await growthPage.goto('http://127.0.0.1:'+port+'/');
+ assert.equal(await growthPage.locator('#sound').getAttribute('aria-pressed'),'false');
+ assert.match(await growthPage.locator('.village strong').innerText(),/Lv. 1/);
+ assert.equal(await growthPage.locator('.concept-progress progress').count(),2);
+ await growthPage.locator('[data-answer]').nth(1).click();
+ await growthPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
+ assert.equal(await growthPage.locator('#village-growth').getAttribute('value'),'1');
+ await growthPage.locator('#next').click();
+ await growthPage.locator('[data-answer]').nth(1).click();
+ await growthPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
+ assert.match(await growthPage.locator('.village strong').innerText(),/Lv. 2/);
+ assert.equal(await growthPage.locator('.village-grown').count(),1);
+ assert.equal(await growthPage.locator('.land').evaluate(el=>getComputedStyle(el).animationName),'none');
+ assert.equal(await growthPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'320px layout must not overflow');
+ await growthPage.reload();
+ assert.match(await growthPage.locator('.village strong').innerText(),/Lv. 2/);
+ assert.equal(await growthPage.locator('.village-grown').count(),0,'reload must not replay milestone celebration');
+ await growthPage.close();
  assert.deepEqual(errors,[],'root preview console/network errors');
  console.log('PASS root preview loads without errors; correct reward persists; hinted/wrong answers do not grant stars');
 }finally{
