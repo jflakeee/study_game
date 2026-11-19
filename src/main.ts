@@ -13,6 +13,8 @@ let state=loadState(localStorage);
 let selected:Question|null=null;
 let tutor:TutorSession|null=null;
 let usedHint=false;
+let gardenCount=0;
+let gardenOpen=false;
 let feedback='';
 let finished=false;
 let saving=false;
@@ -48,7 +50,7 @@ function chooseQuestion(){
  const pool=alternatives.length?alternatives:eligible;
  selected=pool[Math.floor(Math.random()*pool.length)]??null;
  tutor=selected?beginTutor(selected.id,selected.prompt):null;
- usedHint=false;feedback='';finished=false;
+ usedHint=false;gardenCount=0;gardenOpen=false;feedback='';finished=false;
 }
 function render(){
  if(!root)return;
@@ -88,6 +90,7 @@ function render(){
  <section class="village" aria-label="마을 성장"><div class="land${grew?' village-grown':''}" data-stage="${stageIndex}" aria-hidden="true">${preserveLand?'':villageArt(stageIndex)}</div><strong>Lv. ${stageIndex+1} · ${stage.name}</strong><div class="village-progress">${nextStage?`<label for="village-growth">다음 성장까지 별 ${nextStage.stars-state.stars}개</label><progress id="village-growth" value="${state.stars-stage.stars}" max="${nextStage.stars-stage.stars}"></progress>`:'모든 마을 성장 단계 달성!'}</div><small>학습 기록: ${answered}문제 · 정답 ${success}개</small></section>
  <section class="quiz" aria-label="개념별 학습 현황"><h2>📚 오늘의 복습 · ${dueCount}개 개념</h2>${progress.map(p=>`<div class="concept-progress"><label for="mastery-${escape(p.concept.id)}">${p.concept.subject==='math'?'🔢':'📖'} ${escape(p.concept.title)} · 숙련도 ${p.level}/5</label><progress id="mastery-${escape(p.concept.id)}" value="${p.level}" max="5"></progress><small>${p.due?'지금 복습':'다음 복습 '+escape(new Date(p.dueAt!).toLocaleDateString('ko-KR'))}</small><span class="mastery-goal">${p.level>=5?'🏅 숙련 목표 달성 · 꾸준히 복습해요!':`🎯 다음 목표: 숙련도 ${p.level+1}/5 · ${p.due?'복습에 도전해요.':'다음 복습 때 다시 도전해요.'}`}</span></div>`).join('')}</section>
  ${q?`<section class="quiz quest" aria-label="학습 퀘스트"><div class="quest-kicker">오늘의 탐험</div><div class="session-goal"><label for="session-goal-progress">이번 학습 목표 · ${Math.min(sessionCompleted,sessionGoal)}/${sessionGoal}문제</label><progress id="session-goal-progress" value="${Math.min(sessionCompleted,sessionGoal)}" max="${sessionGoal}"></progress><small>${sessionCompleted>=sessionGoal?'🎉 목표 달성! 더 풀거나 쉬어도 좋아요.':'틀려도 끝까지 도전하면 인정돼요.'}</small></div><div class="subject">${q.subject==='math'?'🔢 수학':'📖 국어'} · ${state.grade}학년 · ${escape(concept?.title??'학습')}</div><h2 id="question-heading" tabindex="-1">${escape(q.prompt)}</h2>
+ ${q.subject==='math'?`<details id="number-garden" class="number-garden" ${gardenOpen?'open':''}><summary id="garden-toggle">🍎 숫자 정원 · 직접 세어 보기</summary><p>사과를 더하거나 빼면서 답을 생각해요. 정답은 아래에서 선택해요.</p><div class="garden-apples" aria-hidden="true">${'🍎'.repeat(gardenCount)||'빈 정원'}</div><p role="status">사과 ${gardenCount}개</p><div class="garden-controls"><button type="button" id="garden-minus" ${finished||gardenCount===0?'disabled':''}>− 1</button><button type="button" id="garden-plus" ${finished||gardenCount>=36?'disabled':''}>＋ 1</button><button type="button" id="garden-clear" ${finished||gardenCount===0?'disabled':''}>비우기</button></div></details>`:''}
  <div class="choices">${q.choices.map((c,i)=>`<button class="choice" data-answer="${i}" ${finished?'disabled':''}>${escape(c)}</button>`).join('')}</div>
  <button class="hint" id="hint" ${finished?'disabled':''}>💡 생각 도우미</button>
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
@@ -123,6 +126,10 @@ function render(){
  root.querySelectorAll<HTMLButtonElement>('[data-slot]').forEach(button=>button.addEventListener('click',async()=>{const i=Number(button.dataset.slot);if(saving||!Number.isInteger(i)||i<0||i>=villageSlots.length||selectedBuilding>stageIndex||villageSlots[i]===selectedBuilding)return;const next=[...villageSlots];next[i]=selectedBuilding;await commitVillage(next,[...villageSlots]);}));
  root.querySelector('#building-undo')?.addEventListener('click',async()=>{if(saving||!previousSlots)return;if(await commitVillage(previousSlots,null))root.querySelector<HTMLElement>('#slot-0')?.focus();});
  root.querySelector('#building-reset')?.addEventListener('click',async()=>{if(saving||villageSlots.every(v=>v===null))return;if(await commitVillage(emptySlots(),[...villageSlots]))root.querySelector<HTMLElement>('#building-undo')?.focus();});
+ root.querySelector('#number-garden')?.addEventListener('toggle',()=>{gardenOpen=root.querySelector<HTMLDetailsElement>('#number-garden')?.open??false;});
+ for(const [id,delta] of [['garden-plus',1],['garden-minus',-1],['garden-clear',0]] as const){
+  root.querySelector('#'+id)?.addEventListener('click',()=>{if(saving||finished||q?.subject!=='math')return;gardenOpen=true;gardenCount=delta===0?0:Math.max(0,Math.min(36,gardenCount+delta));render();});
+ }
  root.querySelector('#next')?.addEventListener('click',()=>{if(saving)return;chooseQuestion();render();root.querySelector<HTMLElement>('#question-heading')?.focus();});
  root.querySelectorAll<HTMLButtonElement>('[data-answer]').forEach(b=>b.addEventListener('click',async ()=>{
   if(!q||!tutor||finished||saving)return;
