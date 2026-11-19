@@ -68,7 +68,7 @@ function render(){
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
- if(preserveLand&&existingLand){root.querySelector('.land')?.replaceWith(existingLand);}
+ if(preserveLand&&existingLand){existingLand.classList.remove('village-grown');root.querySelector('.land')?.replaceWith(existingLand);}
  if(existingFeedback){
   const replacement=root.querySelector<HTMLElement>('.feedback');
   if(replacement){replacement.replaceWith(existingFeedback);existingFeedback.textContent=feedback;}
