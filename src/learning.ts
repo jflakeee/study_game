@@ -324,8 +324,8 @@ export const extendedQuestions: Question[] = [
     "prompt": "1 + 5 = ?",
     "choices": [
       "7",
-      "6",
-      "5"
+      "5",
+      "6"
     ],
     "answer": "6",
     "hint": "1부터 5칸 더 세어요.",
@@ -368,8 +368,8 @@ export const extendedQuestions: Question[] = [
     "skillId": "math.add.10",
     "prompt": "2 + 7 = ?",
     "choices": [
-      "8",
       "9",
+      "8",
       "10"
     ],
     "answer": "9",
@@ -414,8 +414,8 @@ export const extendedQuestions: Question[] = [
     "prompt": "2 × 6 = ?",
     "choices": [
       "13",
-      "12",
-      "11"
+      "11",
+      "12"
     ],
     "answer": "12",
     "hint": "2씩 6묶음을 생각해요.",
@@ -458,8 +458,8 @@ export const extendedQuestions: Question[] = [
     "skillId": "math.mul.2",
     "prompt": "5 × 5 = ?",
     "choices": [
-      "26",
       "25",
+      "26",
       "24"
     ],
     "answer": "25",
@@ -504,8 +504,8 @@ export const extendedQuestions: Question[] = [
     "prompt": "12 ÷ 2 = ?",
     "choices": [
       "7",
-      "6",
-      "5"
+      "5",
+      "6"
     ],
     "answer": "6",
     "hint": "12개를 2묶음으로 나눠요.",
@@ -548,8 +548,8 @@ export const extendedQuestions: Question[] = [
     "skillId": "math.div.3",
     "prompt": "35 ÷ 5 = ?",
     "choices": [
-      "8",
       "7",
+      "8",
       "6"
     ],
     "answer": "7",
@@ -638,9 +638,9 @@ export const extendedQuestions: Question[] = [
     "skillId": "korean.word.1",
     "prompt": "신발의 종류를 골라요.",
     "choices": [
-      "운동화",
+      "기차",
       "사과",
-      "기차"
+      "운동화"
     ],
     "answer": "운동화",
     "hint": "발에 신고 움직이는 물건을 떠올려요.",
@@ -668,9 +668,9 @@ export const extendedQuestions: Question[] = [
     "skillId": "korean.word.1",
     "prompt": "곤충을 골라요.",
     "choices": [
-      "나비",
+      "물고기",
       "참새",
-      "물고기"
+      "나비"
     ],
     "answer": "나비",
     "hint": "다리가 여섯 개인 작은 동물을 생각해요.",
@@ -758,9 +758,9 @@ export const extendedQuestions: Question[] = [
     "skillId": "korean.sentence.2",
     "prompt": "\"버스를 놓쳐서 걸어갔다.\" 걸어간 까닭은?",
     "choices": [
-      "버스를 놓쳐서",
+      "물이 차가워서",
       "신발이 커서",
-      "물이 차가워서"
+      "버스를 놓쳐서"
     ],
     "answer": "버스를 놓쳐서",
     "hint": "문장 앞부분에서 이유를 찾아요.",
@@ -803,9 +803,9 @@ export const extendedQuestions: Question[] = [
     "skillId": "korean.reading.3",
     "prompt": "\"수아는 종이를 접었다. 종이배를 완성했다.\" 중심 내용은?",
     "choices": [
-      "종이배 만들기",
+      "꽃 심기",
       "빨래하기",
-      "꽃 심기"
+      "종이배 만들기"
     ],
     "answer": "종이배 만들기",
     "hint": "두 문장에서 이어지는 활동을 생각해요.",
@@ -848,8 +848,8 @@ export const extendedQuestions: Question[] = [
     "skillId": "korean.reading.3",
     "prompt": "\"가족이 채소를 씻었다. 함께 샐러드를 만들었다.\" 중심 내용은?",
     "choices": [
-      "샐러드 만들기",
       "산책하기",
+      "샐러드 만들기",
       "편지 쓰기"
     ],
     "answer": "샐러드 만들기",
