@@ -123,7 +123,7 @@ function render(){
   const next={...state,grade:n};
   const result=await saveStateSafely(localStorage,state,next,navigator.locks);
   saving=false;
-  if(result==='saved'){state=next;chooseQuestion();}
+  if(result==='saved'){state=next;expeditionCompleted=0;selected=null;chooseQuestion();}
   else feedback=result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 시도해 주세요.':'저장에 실패했어요. 브라우저 저장 공간을 확인해 주세요.';
   render();
  });
