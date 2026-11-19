@@ -16,7 +16,9 @@ const escape=(value:string)=>value.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt
 function chooseQuestion(){
  const all=questionsFor(state.grade);
  const due=all.filter(q=>isDue(state.reviews[q.skillId],new Date()));
- const pool=due.length?due:all;
+ const eligible=due.length?due:all;
+ const alternatives=eligible.filter(q=>q.id!==selected?.id);
+ const pool=alternatives.length?alternatives:eligible;
  selected=pool[Math.floor(Math.random()*pool.length)]??null;
  tutor=selected?beginTutor(selected.id,selected.prompt):null;
  usedHint=false;feedback='';finished=false;
