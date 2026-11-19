@@ -1,4 +1,7 @@
 import './style.css';
+import {play,unlockAudio} from 'plinkfx';
+let soundEnabled=false;
+function sound(name:'coin'|'confirm'|'click-soft'){if(soundEnabled){try{play(name,{volume:.22});}catch{/* audio must never interrupt learning */}}}
 import {questionsFor,recordAttempt,type Grade,type Question} from './learning.ts';
 import {loadState,saveStateSafely,STORAGE_KEY} from './storage.ts';
 import {isDue} from './review.ts';
@@ -46,7 +49,7 @@ function render(){
  const nextStage=stages[stageIndex+1];
  const existingFeedback=root.querySelector<HTMLElement>('.feedback');
  root.innerHTML=`<div class="shell"><header><div class="eyebrow">STUDY GAME · P0-B</div><h1>🌱 지식 탐험대</h1><p>스스로 생각하고 마을을 키워요!</p></header>
- <section class="toolbar"><label for="grade">학년 선택</label><select id="grade">${[1,2,3].map(n=>`<option value="${n}" ${state.grade===n?'selected':''}>${n}학년</option>`).join('')}</select><span class="stars" aria-live="polite">⭐ ${state.stars}개</span></section>
+ <section class="toolbar"><label for="grade">학년 선택</label><select id="grade">${[1,2,3].map(n=>`<option value="${n}" ${state.grade===n?'selected':''}>${n}학년</option>`).join('')}</select><button type="button" id="sound" aria-pressed="${soundEnabled}" aria-label="효과음" class="hint">${soundEnabled?'🔊 소리 켜짐':'🔇 소리 꺼짐'}</button><span class="stars" aria-live="polite">⭐ ${state.stars}개</span></section>
  <section class="village" aria-label="마을 성장"><div class="land" aria-hidden="true">${stage.scene}</div><strong>Lv. ${stageIndex+1} · ${stage.name}</strong><div class="village-progress">${nextStage?`<label for="village-growth">다음 성장까지 별 ${nextStage.stars-state.stars}개</label><progress id="village-growth" value="${state.stars-stage.stars}" max="${nextStage.stars-stage.stars}"></progress>`:'모든 마을 성장 단계 달성!'}</div><small>학습 기록: ${answered}문제 · 정답 ${success}개</small></section>
  <section class="quiz" aria-label="개념별 학습 현황"><h2>📚 오늘의 복습 · ${dueCount}개 개념</h2>${progress.map(p=>`<div class="concept-progress"><label for="mastery-${escape(p.concept.id)}">${p.concept.subject==='math'?'🔢':'📖'} ${escape(p.concept.title)} · 숙련도 ${p.level}/5</label><progress id="mastery-${escape(p.concept.id)}" value="${p.level}" max="5"></progress><small>${p.due?'지금 복습':'다음 복습 '+escape(new Date(p.dueAt!).toLocaleDateString('ko-KR'))}</small></div>`).join('')}</section>
  ${q?`<section class="quiz"><div class="subject">${q.subject==='math'?'🔢 수학':'📖 국어'} · ${state.grade}학년 · ${escape(concept?.title??'학습')}</div><h2>${escape(q.prompt)}</h2>
@@ -63,6 +66,7 @@ function render(){
  else if(focusAnswer!==null&&focusAnswer!==undefined&&finished)root.querySelector<HTMLButtonElement>('#next')?.focus();
  else if(focusAnswer!==null&&focusAnswer!==undefined)root.querySelector<HTMLButtonElement>(`[data-answer="${focusAnswer}"]`)?.focus();
  else if(focusId)root.querySelector<HTMLElement>(`#${focusId}`)?.focus();
+ root.querySelector('#sound')?.addEventListener('click',()=>{soundEnabled=!soundEnabled;if(soundEnabled){try{unlockAudio();sound('click-soft');}catch{/* optional audio */}}render();});
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
   if(saving){(e.target as HTMLSelectElement).value=String(state.grade);return;}
   saving=true;
@@ -88,7 +92,7 @@ function render(){
    const gained=next.stars>state.stars;
    const result=await saveStateSafely(localStorage,state,next,navigator.locks);
    const saved=result==='saved';
-   if(saved)state=next;
+   if(saved){state=next;sound(gained?'coin':'confirm');}
    saving=false;
    finished=true;
    feedback=saved?'정답이에요! '+(gained?'⭐ 별 1개 획득! ':'')+step.message:result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 풀어 주세요.':'정답이지만 저장에 실패했어요. 별과 학습 기록은 반영되지 않았어요.';
@@ -103,6 +107,7 @@ function render(){
    feedback=saved?step.message:result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 풀어 주세요.':'저장에 실패했어요. 학습 기록은 반영되지 않았어요.';
   }else{
    usedHint=true;
+   sound('click-soft');
    feedback=step.message;
   }
   render();
