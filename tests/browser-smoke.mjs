@@ -102,7 +102,7 @@ try{
  }
  const page=await browser.newPage();
  await page.goto('http://127.0.0.1:'+port+'/study_game/');
- const q=await page.locator('.quiz').last().locator('h2').innerText();
+ const q=await page.locator('#question-heading').innerText();
  const answers=page.locator('[data-answer]');
  assert.equal(await answers.count(),3);
  await answers.first().click();
@@ -141,7 +141,7 @@ try{
  await rewardContext.addInitScript(()=>{Math.random=()=>0;});
  const rewardPage=await rewardContext.newPage();
  await rewardPage.goto(url);
- assert.equal(await rewardPage.locator('.quiz').last().locator('h2').innerText(),'4 + 3 = ?');
+ assert.equal(await rewardPage.locator('#question-heading').innerText(),'4 + 3 = ?');
  await rewardPage.locator('[data-answer]').nth(1).click();
  await rewardPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
  assert.match(await rewardPage.locator('.stars').innerText(),/1개/);
@@ -158,7 +158,7 @@ try{
   localStorage.setItem(key,JSON.stringify(saved));
  });
  await rewardPage.reload();
- assert.equal(await rewardPage.locator('.quiz').last().locator('h2').innerText(),'4 + 3 = ?');
+ assert.equal(await rewardPage.locator('#question-heading').innerText(),'4 + 3 = ?');
  await rewardPage.locator('[data-answer]').nth(1).click();
  await rewardPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
  assert.match(await rewardPage.locator('.stars').innerText(),/1개/);
@@ -203,9 +203,9 @@ try{
   localStorage.setItem(key,JSON.stringify(saved));
  });
  await masteryPage.reload();
- await masteryPage.evaluate(()=>{Math.random=()=>0.1;});
+ await masteryPage.evaluate(()=>{Math.random=()=>0.06;});
  await masteryPage.locator('#next').click();
- assert.equal(await masteryPage.locator('.quiz').last().locator('h2').innerText(),'6 + 2 = ?');
+ assert.equal(await masteryPage.locator('#question-heading').innerText(),'6 + 2 = ?');
  await masteryPage.locator('[data-answer]').nth(1).click();
  await masteryPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
  assert.match(await masteryPage.locator('.stars').innerText(),/2개/);
@@ -218,7 +218,7 @@ try{
  await wrongContext.addInitScript(()=>{Math.random=()=>0;});
  const wrongPage=await wrongContext.newPage();
  await wrongPage.goto(url);
- assert.equal(await wrongPage.locator('.quiz').last().locator('h2').innerText(),'4 + 3 = ?');
+ assert.equal(await wrongPage.locator('#question-heading').innerText(),'4 + 3 = ?');
  await wrongPage.locator('[data-answer]').first().click();
  await wrongPage.locator('.feedback').filter({hasText:/4부터 세 칸 더 세어 보세요/}).waitFor();
  assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
