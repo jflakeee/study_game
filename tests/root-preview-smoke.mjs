@@ -32,7 +32,9 @@ try{
  await page.locator('#next').filter({hasText:/다음 문제로/}).waitFor();
  await page.locator('#next').focus();
  await page.keyboard.press('Enter');
- await page.locator('#next:focus').waitFor();
+ await page.locator('#question-heading:focus').waitFor();
+ await page.keyboard.press('Tab');
+ assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0','new question heading must lead to the first answer');
  assert.equal(await page.locator('[data-answer]:not([disabled])').count(),3,'answers must be enabled for the new question');
  assert.equal(await page.locator('.feedback').innerText(),'','completed question feedback must clear when advancing');
  assert.match(await page.locator('.stars').innerText(),/1개/);
@@ -79,7 +81,9 @@ try{
  await nextPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
  await nextPage.locator('#next').focus();
  await nextPage.keyboard.press('Enter');
- await nextPage.locator('#next:focus').waitFor();
+ await nextPage.locator('#question-heading:focus').waitFor();
+ await nextPage.keyboard.press('Tab');
+ assert.equal(await nextPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0','new question heading must lead to the first answer');
  assert.equal(await nextPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after skipping to another question');
  assert.equal(await nextPage.locator('[data-answer]:not([disabled])').count(),3,'next question must have enabled answers');
  assert.equal(await nextPage.locator('.feedback').innerText(),'','new question must clear prior feedback');
@@ -207,7 +211,9 @@ try{
  assert.equal(wrong.attempts.length,1,'third wrong answer must persist one attempt');
  await wrongPage.locator('#next').focus();
  await wrongPage.keyboard.press('Enter');
- await wrongPage.locator('#next:focus').waitFor();
+ await wrongPage.locator('#question-heading:focus').waitFor();
+ await wrongPage.keyboard.press('Tab');
+ assert.equal(await wrongPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0','new question heading must lead to the first answer');
  assert.equal(await wrongPage.locator('[data-answer]:not([disabled])').count(),3,'new question must enable choices after three wrong answers');
  assert.equal(await wrongPage.locator('.feedback').innerText(),'','wrong-answer explanation must clear when advancing');
  assert.equal(await wrongPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'feedback live region must survive advancing from wrong answer');
