@@ -32,6 +32,279 @@ export const variantQuestions: Question[] = [
  {id:'k3-main-3',grade:3,subject:'korean',skillId:'korean.reading.3',prompt:'"지수는 씨앗을 심었다. 매일 물을 주며 싹을 기다렸다." 중심 내용은?',choices:['씨앗 기르기','도서관 방문','운동회'],answer:'씨앗 기르기',hint:'씨앗을 심고 무엇을 했나요?',explanation:'씨앗을 심고 돌보는 내용이에요.'}
 ];
 
+export const expansionQuestions: Question[] = [
+  {
+    "id": "m1-add-4",
+    "grade": 1,
+    "subject": "math",
+    "skillId": "math.add.10",
+    "prompt": "2 + 5 = ?",
+    "choices": [
+      "7",
+      "6",
+      "8"
+    ],
+    "answer": "7",
+    "hint": "2부터 다섯 칸 세어요.",
+    "explanation": "2+5=7이에요."
+  },
+  {
+    "id": "m1-add-5",
+    "grade": 1,
+    "subject": "math",
+    "skillId": "math.add.10",
+    "prompt": "3 + 6 = ?",
+    "choices": [
+      "8",
+      "10",
+      "9"
+    ],
+    "answer": "9",
+    "hint": "3부터 여섯 칸 세어요.",
+    "explanation": "3+6=9예요."
+  },
+  {
+    "id": "m1-add-6",
+    "grade": 1,
+    "subject": "math",
+    "skillId": "math.add.10",
+    "prompt": "4 + 4 = ?",
+    "choices": [
+      "9",
+      "8",
+      "7"
+    ],
+    "answer": "8",
+    "hint": "4를 두 번 더해요.",
+    "explanation": "4+4=8이에요."
+  },
+  {
+    "id": "k1-word-4",
+    "grade": 1,
+    "subject": "korean",
+    "skillId": "korean.word.1",
+    "prompt": "옷을 골라요.",
+    "choices": [
+      "바지",
+      "연필",
+      "사과"
+    ],
+    "answer": "바지",
+    "hint": "몸에 입는 물건이에요.",
+    "explanation": "바지는 옷이에요."
+  },
+  {
+    "id": "k1-word-5",
+    "grade": 1,
+    "subject": "korean",
+    "skillId": "korean.word.1",
+    "prompt": "악기를 골라요.",
+    "choices": [
+      "책상",
+      "우산",
+      "피아노"
+    ],
+    "answer": "피아노",
+    "hint": "소리를 내어 음악을 연주해요.",
+    "explanation": "피아노는 악기예요."
+  },
+  {
+    "id": "k1-word-6",
+    "grade": 1,
+    "subject": "korean",
+    "skillId": "korean.word.1",
+    "prompt": "채소를 골라요.",
+    "choices": [
+      "공책",
+      "당근",
+      "신발"
+    ],
+    "answer": "당근",
+    "hint": "밭에서 자라는 먹거리예요.",
+    "explanation": "당근은 채소예요."
+  },
+  {
+    "id": "m2-mul-4",
+    "grade": 2,
+    "subject": "math",
+    "skillId": "math.mul.2",
+    "prompt": "5 × 3 = ?",
+    "choices": [
+      "15",
+      "8",
+      "20"
+    ],
+    "answer": "15",
+    "hint": "5를 세 번 더해요.",
+    "explanation": "5+5+5=15예요."
+  },
+  {
+    "id": "m2-mul-5",
+    "grade": 2,
+    "subject": "math",
+    "skillId": "math.mul.2",
+    "prompt": "6 × 2 = ?",
+    "choices": [
+      "8",
+      "14",
+      "12"
+    ],
+    "answer": "12",
+    "hint": "6을 두 번 더해요.",
+    "explanation": "6+6=12예요."
+  },
+  {
+    "id": "m2-mul-6",
+    "grade": 2,
+    "subject": "math",
+    "skillId": "math.mul.2",
+    "prompt": "4 × 5 = ?",
+    "choices": [
+      "24",
+      "20",
+      "9"
+    ],
+    "answer": "20",
+    "hint": "4를 다섯 번 더해요.",
+    "explanation": "4+4+4+4+4=20이에요."
+  },
+  {
+    "id": "k2-sentence-4",
+    "grade": 2,
+    "subject": "korean",
+    "skillId": "korean.sentence.2",
+    "prompt": "목이 말라서 물을 마셨다. 까닭은?",
+    "choices": [
+      "목이 말라서",
+      "추워서",
+      "비가 와서"
+    ],
+    "answer": "목이 말라서",
+    "hint": "물 마시기 전 상태를 찾아요.",
+    "explanation": "목이 말랐기 때문이에요."
+  },
+  {
+    "id": "k2-sentence-5",
+    "grade": 2,
+    "subject": "korean",
+    "skillId": "korean.sentence.2",
+    "prompt": "버스를 놓쳐서 걸어갔다. 까닭은?",
+    "choices": [
+      "배가 고파서",
+      "졸려서",
+      "버스를 놓쳐서"
+    ],
+    "answer": "버스를 놓쳐서",
+    "hint": "문장 앞부분을 읽어요.",
+    "explanation": "버스를 놓쳤기 때문이에요."
+  },
+  {
+    "id": "k2-sentence-6",
+    "grade": 2,
+    "subject": "korean",
+    "skillId": "korean.sentence.2",
+    "prompt": "날이 어두워져서 불을 켰다. 까닭은?",
+    "choices": [
+      "더워서",
+      "날이 어두워져서",
+      "음악이 좋아서"
+    ],
+    "answer": "날이 어두워져서",
+    "hint": "불을 켜기 전 상황을 찾아요.",
+    "explanation": "날이 어두워졌기 때문이에요."
+  },
+  {
+    "id": "m3-div-4",
+    "grade": 3,
+    "subject": "math",
+    "skillId": "math.div.3",
+    "prompt": "28 ÷ 7 = ?",
+    "choices": [
+      "4",
+      "3",
+      "5"
+    ],
+    "answer": "4",
+    "hint": "7에 무엇을 곱하면 28일까요?",
+    "explanation": "7×4=28이에요."
+  },
+  {
+    "id": "m3-div-5",
+    "grade": 3,
+    "subject": "math",
+    "skillId": "math.div.3",
+    "prompt": "36 ÷ 6 = ?",
+    "choices": [
+      "5",
+      "7",
+      "6"
+    ],
+    "answer": "6",
+    "hint": "6씩 묶어 보세요.",
+    "explanation": "6×6=36이에요."
+  },
+  {
+    "id": "m3-div-6",
+    "grade": 3,
+    "subject": "math",
+    "skillId": "math.div.3",
+    "prompt": "45 ÷ 5 = ?",
+    "choices": [
+      "10",
+      "9",
+      "8"
+    ],
+    "answer": "9",
+    "hint": "5에 무엇을 곱하면 45일까요?",
+    "explanation": "5×9=45예요."
+  },
+  {
+    "id": "k3-main-4",
+    "grade": 3,
+    "subject": "korean",
+    "skillId": "korean.reading.3",
+    "prompt": "수아는 책을 빌렸다. 집에서 끝까지 읽었다. 중심 내용은?",
+    "choices": [
+      "책 읽기",
+      "요리하기",
+      "달리기"
+    ],
+    "answer": "책 읽기",
+    "hint": "수아가 한 활동을 생각해요.",
+    "explanation": "책을 빌려 읽은 이야기예요."
+  },
+  {
+    "id": "k3-main-5",
+    "grade": 3,
+    "subject": "korean",
+    "skillId": "korean.reading.3",
+    "prompt": "친구들은 종이를 모았다. 새 종이로 재활용했다. 중심 내용은?",
+    "choices": [
+      "축구 연습",
+      "꽃 심기",
+      "종이 재활용"
+    ],
+    "answer": "종이 재활용",
+    "hint": "종이를 모아 무엇을 했나요?",
+    "explanation": "종이를 재활용한 이야기예요."
+  },
+  {
+    "id": "k3-main-6",
+    "grade": 3,
+    "subject": "korean",
+    "skillId": "korean.reading.3",
+    "prompt": "준호는 강아지에게 밥을 주었다. 함께 산책했다. 중심 내용은?",
+    "choices": [
+      "과일 사기",
+      "강아지 돌보기",
+      "학교 청소"
+    ],
+    "answer": "강아지 돌보기",
+    "hint": "두 행동의 공통 대상을 찾아요.",
+    "explanation": "강아지를 돌본 이야기예요."
+  }
+];
+
 export function checkAnswer(question: Question, response: string): boolean { return response.normalize('NFC').trim() === question.answer.normalize('NFC').trim(); }
 export function ratingFor(correct: boolean, usedHint: boolean): Rating { return !correct ? 'again' : usedHint ? 'hard' : 'good'; }
 export function createState(grade: Grade = 1): GameState { return {version:1,grade,attempts:[],reviews:{},stars:0}; }
@@ -42,4 +315,4 @@ export function recordAttempt(state: GameState, question: Question, response: st
   const firstIndependentCorrect=correct&&!usedHint&&!state.attempts.some(a=>a.questionId===question.id&&a.correct&&!a.usedHint);
   return {...state,attempts:[...state.attempts,{questionId:question.id,skillId:question.skillId,correct,usedHint,at:at.toISOString()}],reviews,stars:state.stars+(firstIndependentCorrect?1:0)};
 }
-export function questionsFor(grade: Grade, subject?: Subject): Question[] { return [...questions,...variantQuestions].filter(q=>q.grade===grade && (!subject || q.subject===subject)); }
+export function questionsFor(grade: Grade, subject?: Subject): Question[] { return [...questions,...variantQuestions,...expansionQuestions].filter(q=>q.grade===grade && (!subject || q.subject===subject)); }
