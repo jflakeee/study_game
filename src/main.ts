@@ -56,9 +56,11 @@ function render(){
  const stage=stages[stageIndex];
  const nextStage=stages[stageIndex+1];
  const existingFeedback=root.querySelector<HTMLElement>('.feedback');
+ const existingLand=root.querySelector<HTMLElement>('.land');
+ const preserveLand=existingLand?.dataset.stage===String(stageIndex);
  root.innerHTML=`<div class="shell"><header><div class="eyebrow">STUDY GAME · P0-B</div><h1>🌱 지식 탐험대</h1><p>스스로 생각하고 마을을 키워요!</p></header>
  <section class="toolbar"><label for="grade">학년 선택</label><select id="grade">${[1,2,3].map(n=>`<option value="${n}" ${state.grade===n?'selected':''}>${n}학년</option>`).join('')}</select><button type="button" id="sound" aria-pressed="${soundEnabled}" aria-label="효과음" class="hint">${soundEnabled?'🔊 소리 켜짐':'🔇 소리 꺼짐'}</button><span class="stars" aria-live="polite">⭐ ${state.stars}개</span></section>
- <section class="village" aria-label="마을 성장"><div class="land${grew?' village-grown':''}" aria-hidden="true">${villageArt(stageIndex)}</div><strong>Lv. ${stageIndex+1} · ${stage.name}</strong><div class="village-progress">${nextStage?`<label for="village-growth">다음 성장까지 별 ${nextStage.stars-state.stars}개</label><progress id="village-growth" value="${state.stars-stage.stars}" max="${nextStage.stars-stage.stars}"></progress>`:'모든 마을 성장 단계 달성!'}</div><small>학습 기록: ${answered}문제 · 정답 ${success}개</small></section>
+ <section class="village" aria-label="마을 성장"><div class="land${grew?' village-grown':''}" data-stage="${stageIndex}" aria-hidden="true">${preserveLand?'':villageArt(stageIndex)}</div><strong>Lv. ${stageIndex+1} · ${stage.name}</strong><div class="village-progress">${nextStage?`<label for="village-growth">다음 성장까지 별 ${nextStage.stars-state.stars}개</label><progress id="village-growth" value="${state.stars-stage.stars}" max="${nextStage.stars-stage.stars}"></progress>`:'모든 마을 성장 단계 달성!'}</div><small>학습 기록: ${answered}문제 · 정답 ${success}개</small></section>
  <section class="quiz" aria-label="개념별 학습 현황"><h2>📚 오늘의 복습 · ${dueCount}개 개념</h2>${progress.map(p=>`<div class="concept-progress"><label for="mastery-${escape(p.concept.id)}">${p.concept.subject==='math'?'🔢':'📖'} ${escape(p.concept.title)} · 숙련도 ${p.level}/5</label><progress id="mastery-${escape(p.concept.id)}" value="${p.level}" max="5"></progress><small>${p.due?'지금 복습':'다음 복습 '+escape(new Date(p.dueAt!).toLocaleDateString('ko-KR'))}</small></div>`).join('')}</section>
  ${q?`<section class="quiz quest" aria-label="학습 퀘스트"><div class="quest-kicker">오늘의 탐험</div><div class="subject">${q.subject==='math'?'🔢 수학':'📖 국어'} · ${state.grade}학년 · ${escape(concept?.title??'학습')}</div><h2>${escape(q.prompt)}</h2>
  <div class="choices">${q.choices.map((c,i)=>`<button class="choice" data-answer="${i}" ${finished?'disabled':''}>${escape(c)}</button>`).join('')}</div>
@@ -66,6 +68,7 @@ function render(){
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
+ if(preserveLand&&existingLand){root.querySelector('.land')?.replaceWith(existingLand);}
  if(existingFeedback){
   const replacement=root.querySelector<HTMLElement>('.feedback');
   if(replacement){replacement.replaceWith(existingFeedback);existingFeedback.textContent=feedback;}
