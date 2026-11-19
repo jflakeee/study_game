@@ -158,7 +158,6 @@ try{
   localStorage.setItem(key,JSON.stringify(saved));
  });
  await rewardPage.reload();
- await rewardPage.locator('#next').click();
  assert.equal(await rewardPage.locator('.quiz').last().locator('h2').innerText(),'4 + 3 = ?');
  await rewardPage.locator('[data-answer]').nth(1).click();
  await rewardPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
@@ -204,7 +203,7 @@ try{
   localStorage.setItem(key,JSON.stringify(saved));
  });
  await masteryPage.reload();
- await masteryPage.evaluate(()=>{Math.random=()=>0.4;});
+ await masteryPage.evaluate(()=>{Math.random=()=>0.1;});
  await masteryPage.locator('#next').click();
  assert.equal(await masteryPage.locator('.quiz').last().locator('h2').innerText(),'6 + 2 = ?');
  await masteryPage.locator('[data-answer]').nth(1).click();
@@ -264,6 +263,8 @@ try{
  await keyboardPage.goto(url);
  await keyboardPage.keyboard.press('Tab');
  assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.id),'grade');
+ await keyboardPage.keyboard.press('Tab');
+ assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.id),'sound');
  await keyboardPage.keyboard.press('Tab');
  assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0');
  await keyboardPage.keyboard.press('Tab');
