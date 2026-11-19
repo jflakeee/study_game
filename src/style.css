@@ -71,3 +71,5 @@ button,select{touch-action:manipulation}
 .village-journal summary{cursor:pointer;min-height:44px;padding:12px 0;font-weight:800;color:#315b37}.village-journal summary:focus-visible{outline:4px solid #815600;outline-offset:2px}.village-journal ol{list-style:none;padding:0;margin:8px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:8px}.village-journal li{padding:10px;border-radius:10px;background:#edf5e8;display:grid;gap:4px;min-width:0}.village-journal li small{color:#526577}.village-journal .undiscovered{background:#f0f3f5;color:#526577}@media (orientation:landscape) and (min-width:650px) and (max-height:500px){.shell>.village-journal{grid-column:1/-1;grid-row:5}.shell>footer{grid-row:6}}
 
 .session-goal{display:grid;gap:4px;background:#edf5e8;border-radius:10px;padding:8px 10px;margin:6px 0 10px;color:#315b37;font-size:.85rem}.session-goal label{font-weight:700}.session-goal progress{width:100%;height:8px;accent-color:#347b45}.session-goal small{font-size:.8rem;line-height:1.4}
+
+.discovery-story{font-size:.85rem;line-height:1.6;margin:4px 0 0;color:#344259}.undiscovered .discovery-story{color:#526577}
