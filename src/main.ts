@@ -1,4 +1,5 @@
 import './style.css';
+import {loadVillage,saveVillage,VILLAGE_KEY,emptySlots,type Slots} from './village-storage.ts';
 import {play,unlockAudio} from 'plinkfx';
 let soundEnabled=false;
 function sound(name:'coin'|'confirm'|'click-soft'){if(soundEnabled){try{play(name,{volume:.22});}catch{/* audio must never interrupt learning */}}}
@@ -18,9 +19,19 @@ let saving=false;
 let sessionCompleted=0;
 let selectedBuilding=0;
 let selectedRegion=0;
-let villageSlots:(number|null)[]=Array(6).fill(null);
+let villageSnapshot=loadVillage(localStorage);
+let villageSlots:Slots=villageSnapshot.slots;
+let villageNotice=villageSnapshot.readable?'':'건축 기록을 읽을 수 없어요. 기존 기록은 보존됩니다.';
 let previousSlots:(number|null)[]|null=null;
 const buildingIcons=['🏡','🌳','🏫','📚','🏛️','🌷','🎡','🗼','🚩'];
+async function commitVillage(next:Slots,undo:Slots|null){
+ if(saving||!villageSnapshot.readable)return false;
+ saving=true;
+ const result=await saveVillage(localStorage,villageSnapshot.raw,next,navigator.locks);
+ saving=false;
+ if(result.ok){villageSnapshot={raw:result.raw,slots:next,readable:true};villageSlots=next;previousSlots=undo;villageNotice='건축 기록을 저장했어요.';}else villageNotice='건축 기록을 저장하지 못했어요. 새로고침 후 다시 시도해 주세요.';
+ render();return result.ok;
+}
 const sessionGoal=3;
 let renderedVillageStage:number|undefined;
 const escape=(value:string)=>value.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]!));
@@ -80,7 +91,7 @@ function render(){
  <button class="hint" id="hint" ${finished?'disabled':''}>💡 생각 도우미</button>
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
- <details id="village-journal" class="quiz village-journal" ${journalOpen?'open':''}><summary id="journal-toggle">마을 수집 도감 · ${stageIndex+1}/${stages.length}</summary><ol>${stages.map((item,i)=>`<li class="${i<=stageIndex?'discovered':'undiscovered'}"><strong>${i<=stageIndex?'✓ '+discoveries[i]:'🔒 '+discoveries[i]}</strong><small>${item.name} · 별 ${item.stars}개</small><p class="discovery-story">${i<=stageIndex?stories[i]:'마을이 성장하면 새 이야기가 열려요.'}</p><button type="button" class="building-select" id="building-${i}" data-building="${i}" aria-pressed="${selectedBuilding===i}" ${i>stageIndex?'disabled':''}>${i>stageIndex?'잠김':selectedBuilding===i?'선택됨':'선택하기'}</button></li>`).join('')}</ol><p class="building-preview" role="status">선택한 건축물: ${discoveries[selectedBuilding]} · 빈 칸이나 건물을 눌러 배치해요.</p><div class="building-slots" aria-label="나만의 마을">${villageSlots.map((building,i)=>`<button type="button" id="slot-${i}" data-slot="${i}" aria-label="${i+1}번 자리: ${building===null?'빈 칸':discoveries[building]}">${building===null?'＋':buildingIcons[building]}<small>${building===null?'빈 칸':discoveries[building]}</small></button>`).join('')}</div><div class="building-actions"><button type="button" id="building-undo" ${previousSlots?'':'disabled'}>되돌리기</button><button type="button" id="building-reset" ${villageSlots.every(v=>v===null)?'disabled':''}>비우기</button></div></details>
+ <details id="village-journal" class="quiz village-journal" ${journalOpen?'open':''}><summary id="journal-toggle">마을 수집 도감 · ${stageIndex+1}/${stages.length}</summary><ol>${stages.map((item,i)=>`<li class="${i<=stageIndex?'discovered':'undiscovered'}"><strong>${i<=stageIndex?'✓ '+discoveries[i]:'🔒 '+discoveries[i]}</strong><small>${item.name} · 별 ${item.stars}개</small><p class="discovery-story">${i<=stageIndex?stories[i]:'마을이 성장하면 새 이야기가 열려요.'}</p><button type="button" class="building-select" id="building-${i}" data-building="${i}" aria-pressed="${selectedBuilding===i}" ${i>stageIndex?'disabled':''}>${i>stageIndex?'잠김':selectedBuilding===i?'선택됨':'선택하기'}</button></li>`).join('')}</ol><p class="building-preview" role="status">선택한 건축물: ${discoveries[selectedBuilding]} · 빈 칸이나 건물을 눌러 배치해요.</p><div class="building-slots" aria-label="나만의 마을">${villageSlots.map((building,i)=>`<button type="button" id="slot-${i}" data-slot="${i}" aria-label="${i+1}번 자리: ${building===null?'빈 칸':discoveries[building]}">${building===null?'＋':building>stageIndex?'🔒':buildingIcons[building]}<small>${building===null?'빈 칸':discoveries[building]}</small></button>`).join('')}</div><div class="building-actions"><button type="button" id="building-undo" ${previousSlots?'':'disabled'}>되돌리기</button><button type="button" id="building-reset" ${villageSlots.every(v=>v===null)?'disabled':''}>비우기</button></div><p class="building-preview" role="status">${escape(villageNotice)}</p></details>
  <details id="world-map" class="quiz world-map" ${worldOpen?'open':''}><summary id="world-toggle">🗺️ 지식 왕국 탐험 · ${stageIndex+1}/${stages.length}</summary><ol class="world-route">${stages.map((item,i)=>`<li><button type="button" id="region-${i}" data-region="${i}" aria-pressed="${selectedRegion===i}" ${i>stageIndex?'disabled':''}><span aria-hidden="true">${i>stageIndex?'🔒':buildingIcons[i]}</span><strong>${item.name}</strong><small>${i>stageIndex?'별 '+item.stars+'개에 해금':'탐험 가능'}</small></button></li>`).join('')}</ol><div class="region-story" role="status"><strong>${stages[selectedRegion].name}</strong><p>${stories[selectedRegion]}</p></div></details>
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
  if(preserveLand&&existingLand){existingLand.classList.remove('village-grown');root.querySelector('.land')?.replaceWith(existingLand);}
@@ -107,9 +118,9 @@ function render(){
  root.querySelector('#hint')?.addEventListener('click',()=>{if(!q||finished||saving)return;usedHint=true;feedback=q.hint;render();});
  root.querySelectorAll<HTMLButtonElement>('[data-region]').forEach(button=>button.addEventListener('click',()=>{const index=Number(button.dataset.region);if(saving||!Number.isInteger(index)||index<0||index>stageIndex)return;selectedRegion=index;render();}));
  root.querySelectorAll<HTMLButtonElement>('[data-building]').forEach(button=>button.addEventListener('click',()=>{const index=Number(button.dataset.building);if(saving||!Number.isInteger(index)||index<0||index>stageIndex)return;selectedBuilding=index;render();}));
- root.querySelectorAll<HTMLButtonElement>('[data-slot]').forEach(button=>button.addEventListener('click',()=>{const i=Number(button.dataset.slot);if(saving||!Number.isInteger(i)||i<0||i>=villageSlots.length||selectedBuilding>stageIndex||villageSlots[i]===selectedBuilding)return;previousSlots=[...villageSlots];villageSlots[i]=selectedBuilding;render();}));
- root.querySelector('#building-undo')?.addEventListener('click',()=>{if(saving||!previousSlots)return;villageSlots=previousSlots;previousSlots=null;render();root.querySelector<HTMLElement>('#slot-0')?.focus();});
- root.querySelector('#building-reset')?.addEventListener('click',()=>{if(saving||villageSlots.every(v=>v===null))return;previousSlots=[...villageSlots];villageSlots=Array(6).fill(null);render();root.querySelector<HTMLElement>('#building-undo')?.focus();});
+ root.querySelectorAll<HTMLButtonElement>('[data-slot]').forEach(button=>button.addEventListener('click',async()=>{const i=Number(button.dataset.slot);if(saving||!Number.isInteger(i)||i<0||i>=villageSlots.length||selectedBuilding>stageIndex||villageSlots[i]===selectedBuilding)return;const next=[...villageSlots];next[i]=selectedBuilding;await commitVillage(next,[...villageSlots]);}));
+ root.querySelector('#building-undo')?.addEventListener('click',async()=>{if(saving||!previousSlots)return;if(await commitVillage(previousSlots,null))root.querySelector<HTMLElement>('#slot-0')?.focus();});
+ root.querySelector('#building-reset')?.addEventListener('click',async()=>{if(saving||villageSlots.every(v=>v===null))return;if(await commitVillage(emptySlots(),[...villageSlots]))root.querySelector<HTMLElement>('#building-undo')?.focus();});
  root.querySelector('#next')?.addEventListener('click',()=>{if(saving)return;chooseQuestion();render();root.querySelector<HTMLElement>('#question-heading')?.focus();});
  root.querySelectorAll<HTMLButtonElement>('[data-answer]').forEach(b=>b.addEventListener('click',async ()=>{
   if(!q||!tutor||finished||saving)return;
@@ -145,6 +156,7 @@ function render(){
  }));
 }
 window.addEventListener('storage',event=>{
+ if(event.key===VILLAGE_KEY){villageNotice='다른 탭에서 건축 기록이 변경됐어요. 새로고침해 주세요.';render();}
  if(event.key===STORAGE_KEY){
   feedback='다른 탭에서 학습 기록이 변경됐어요. 최신 기록을 불러오려면 새로고침해 주세요.';
   render();
