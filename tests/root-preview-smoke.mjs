@@ -34,6 +34,7 @@ try{
  await page.keyboard.press('Enter');
  await page.locator('#question-heading:focus').waitFor();
  await page.keyboard.press('Tab');
+ if(await page.locator('#garden-toggle:focus').count())await page.keyboard.press('Tab');
  assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0','new question heading must lead to the first answer');
  assert.equal(await page.locator('[data-answer]:not([disabled])').count(),3,'answers must be enabled for the new question');
  assert.equal(await page.locator('.feedback').innerText(),'','completed question feedback must clear when advancing');
@@ -83,6 +84,7 @@ try{
  await nextPage.keyboard.press('Enter');
  await nextPage.locator('#question-heading:focus').waitFor();
  await nextPage.keyboard.press('Tab');
+ if(await nextPage.locator('#garden-toggle:focus').count())await nextPage.keyboard.press('Tab');
  assert.equal(await nextPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0','new question heading must lead to the first answer');
  assert.equal(await nextPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after skipping to another question');
  assert.equal(await nextPage.locator('[data-answer]:not([disabled])').count(),3,'next question must have enabled answers');
@@ -215,6 +217,7 @@ try{
  await wrongPage.keyboard.press('Enter');
  await wrongPage.locator('#question-heading:focus').waitFor();
  await wrongPage.keyboard.press('Tab');
+ if(await wrongPage.locator('#garden-toggle:focus').count())await wrongPage.keyboard.press('Tab');
  assert.equal(await wrongPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0','new question heading must lead to the first answer');
  assert.equal(await wrongPage.locator('[data-answer]:not([disabled])').count(),3,'new question must enable choices after three wrong answers');
  assert.equal(await wrongPage.locator('.feedback').innerText(),'','wrong-answer explanation must clear when advancing');
