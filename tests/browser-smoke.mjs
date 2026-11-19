@@ -266,6 +266,9 @@ try{
  await keyboardPage.keyboard.press('Tab');
  assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.id),'sound');
  await keyboardPage.keyboard.press('Tab');
+ assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.id),'expedition-toggle');
+ await keyboardPage.keyboard.press('Tab');
+ if(await keyboardPage.locator('#garden-toggle:focus').count())await keyboardPage.keyboard.press('Tab');
  assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'0');
  await keyboardPage.keyboard.press('Tab');
  assert.equal(await keyboardPage.evaluate(()=>document.activeElement?.getAttribute('data-answer')),'1');
