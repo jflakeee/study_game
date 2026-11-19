@@ -116,6 +116,35 @@ try{
  await reader.reload();
  assert.equal(await reader.locator('#grade').inputValue(),'2','stale tab must load writer grade after reload');
  await sharedContext.close();
+ const pendingPage=track(await browser.newPage());
+ await pendingPage.addInitScript(()=>{Math.random=()=>0;});
+ await pendingPage.goto('http://127.0.0.1:'+port+'/');
+ await pendingPage.evaluate(async()=>{
+  let acquired;
+  const ready=new Promise(resolve=>{acquired=resolve;});
+  const hold=new Promise(resolve=>{window.__releaseSaveLock=resolve;});
+  void navigator.locks.request('study-game-v1-state',async()=>{acquired();await hold;});
+  await ready;
+ });
+ const pendingPrompt=await pendingPage.locator('.quiz h2').last().innerText();
+ await pendingPage.locator('[data-answer]').nth(1).click();
+ try{
+  await pendingPage.locator('[data-answer]').nth(1).click();
+  await pendingPage.locator('#hint').click();
+  await pendingPage.locator('#next').click();
+  await pendingPage.locator('#grade').selectOption('2');
+  assert.equal(await pendingPage.locator('#grade').inputValue(),'1','pending save must reject grade changes');
+  assert.equal(await pendingPage.locator('.quiz h2').last().innerText(),pendingPrompt,'pending save must reject navigation');
+  assert.equal(await pendingPage.locator('.feedback').innerText(),'','pending save must reject hints');
+  assert.equal(await pendingPage.evaluate(()=>localStorage.getItem('study-game-state-v1')),null,'held lock must prevent early writes');
+ }finally{
+  await pendingPage.evaluate(()=>window.__releaseSaveLock());
+ }
+ await pendingPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
+ const pendingSaved=await pendingPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
+ assert.equal(pendingSaved.attempts.length,1,'pending save must reject duplicate answers');
+ assert.equal(pendingSaved.stars,1);
+ await pendingPage.close();
  const wrongPage=track(await browser.newPage());
  await wrongPage.addInitScript(()=>{Math.random=()=>0;});
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
