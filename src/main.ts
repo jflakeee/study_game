@@ -53,6 +53,8 @@ function render(){
  const stageIndex=stages.reduce((index,stage,i)=>state.stars>=stage.stars?i:index,0);
  const grew=renderedVillageStage!==undefined&&stageIndex>renderedVillageStage;
  renderedVillageStage=stageIndex;
+ const journalOpen=root.querySelector<HTMLDetailsElement>('#village-journal')?.open??false;
+ const discoveries=['작은 집','푸른 나무','학교','도서관','시청','꽃 정원','풍차','별빛 탑','왕국 깃발'];
  const stage=stages[stageIndex];
  const nextStage=stages[stageIndex+1];
  const existingFeedback=root.querySelector<HTMLElement>('.feedback');
@@ -67,6 +69,7 @@ function render(){
  <button class="hint" id="hint" ${finished?'disabled':''}>💡 생각 도우미</button>
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
+ <details id="village-journal" class="quiz village-journal" ${journalOpen?'open':''}><summary id="journal-toggle">마을 수집 도감 · ${stageIndex+1}/${stages.length}</summary><ol>${stages.map((item,i)=>`<li class="${i<=stageIndex?'discovered':'undiscovered'}"><strong>${i<=stageIndex?'✓ '+discoveries[i]:'🔒 '+discoveries[i]}</strong><small>${item.name} · 별 ${item.stars}개</small></li>`).join('')}</ol></details>
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
  if(preserveLand&&existingLand){existingLand.classList.remove('village-grown');root.querySelector('.land')?.replaceWith(existingLand);}
  if(existingFeedback){
