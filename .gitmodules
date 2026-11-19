@@ -7,3 +7,6 @@
 [submodule "tools/plinkfx"]
 	path = tools/plinkfx
 	url = https://github.com/maximilianfeix/plinkfx.git
+[submodule "tools/gamedev-agent-skills"]
+	path = tools/gamedev-agent-skills
+	url = https://github.com/gamedev-skills/awesome-gamedev-agent-skills.git
