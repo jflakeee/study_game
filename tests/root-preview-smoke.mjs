@@ -284,6 +284,28 @@ try{
  assert.equal(await growthPage.evaluate(()=>localStorage.getItem('study-game-state-v1')),learningBefore);
  assert.equal(await growthPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  await growthPage.close();
+ const miniPage=track(await browser.newPage({viewport:{width:320,height:700}}));
+ await miniPage.addInitScript(()=>{Math.random=()=>0;});
+ await miniPage.goto('http://127.0.0.1:'+port+'/');
+ await miniPage.locator('#garden-toggle').click();
+ await miniPage.locator('#garden-plus').click();
+ await miniPage.locator('#number-garden [role=status]').filter({hasText:'사과 1개'}).waitFor();
+ await miniPage.locator('#garden-clear').click();
+ await miniPage.locator('#number-garden [role=status]').filter({hasText:'사과 0개'}).waitFor();
+ await miniPage.locator('#expedition-toggle').click();
+ assert.equal(await miniPage.locator('#expedition-toggle').getAttribute('aria-pressed'),'true');
+ await miniPage.locator('[data-answer]').nth(1).click();
+ await miniPage.locator('.expedition-status').filter({hasText:'1/3'}).waitFor();
+ await miniPage.locator('#next').click();
+ await miniPage.locator('.word-forest-banner').waitFor();
+ assert.equal(await miniPage.locator('#number-garden').count(),0);
+ await miniPage.locator('[data-answer]').nth(1).click();
+ await miniPage.locator('.expedition-status').filter({hasText:'2/3'}).waitFor();
+ await miniPage.locator('#next').click();
+ await miniPage.locator('#garden-toggle').waitFor();
+ assert.equal(await miniPage.locator('#number-garden [role=status]').textContent(),'사과 0개');
+ assert.equal(await miniPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await miniPage.close();
  assert.deepEqual(errors,[],'root preview console/network errors');
  console.log('PASS root preview loads without errors; correct reward persists; hinted/wrong answers do not grant stars');
 }finally{
