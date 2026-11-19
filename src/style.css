@@ -77,3 +77,5 @@ button,select{touch-action:manipulation}
 /* P3: compact optional growth information without shrinking answer targets. */
 .mastery-goal{font-size:.8rem;line-height:1.45;color:#315b37;overflow-wrap:anywhere}.session-goal,.concept-progress,.village-journal li{min-width:0}.session-goal progress,.concept-progress progress{min-width:0;max-width:100%}.village-journal summary{overflow-wrap:anywhere}.village-journal .discovery-story{margin:4px 0 0;line-height:1.5}
 @media(max-width:390px){.session-goal{padding:6px 8px;margin:4px 0 8px;gap:3px}.concept-progress{margin:8px 0;gap:3px}.village-journal ol{grid-template-columns:minmax(0,1fr)}.village-journal li{padding:8px 10px}}
+
+.building-select{min-height:44px;border:1px solid #91b390;border-radius:10px;background:#fff;color:#315b37;font:inherit;font-size:.85rem;padding:8px;cursor:pointer}.building-select[aria-pressed=true]{background:#315b37;color:white}.building-select:disabled{background:#e6e9eb;color:#526577;cursor:default;border-color:#c7cdd1}.building-preview{font-size:.85rem;color:#315b37;font-weight:700}
