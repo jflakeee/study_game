@@ -57,6 +57,7 @@ function render(){
  renderedVillageStage=stageIndex;
  const journalOpen=root.querySelector<HTMLDetailsElement>('#village-journal')?.open??false;
  const discoveries=['작은 집','푸른 나무','학교','도서관','시청','꽃 정원','풍차','별빛 탑','왕국 깃발'];
+ const stories=["작은 집에 첫 책이 도착했어요. 배움의 모험이 시작됩니다.","나무 아래에서 친구들과 이야기를 나눠요.","학교가 문을 열었어요. 서로의 질문에서 배워요.","도서관에 지혜가 쌓여요. 새로운 이야기를 찾아봐요.","탐험 도시에서 친구들이 힘을 모아 길을 만들어요.","꽃 정원에서 작은 씨앗이 자라듯 지식도 자라요.","풍차를 보며 어떻게 움직이는지 함께 생각해요.","별빛 탑에서 밤하늘의 궁금증을 발견해요.","지식 왕국이 완성됐어요. 배운 것을 친구들과 나눠요."];
  const stage=stages[stageIndex];
  const nextStage=stages[stageIndex+1];
  const existingFeedback=root.querySelector<HTMLElement>('.feedback');
@@ -71,7 +72,7 @@ function render(){
  <button class="hint" id="hint" ${finished?'disabled':''}>💡 생각 도우미</button>
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
- <details id="village-journal" class="quiz village-journal" ${journalOpen?'open':''}><summary id="journal-toggle">마을 수집 도감 · ${stageIndex+1}/${stages.length}</summary><ol>${stages.map((item,i)=>`<li class="${i<=stageIndex?'discovered':'undiscovered'}"><strong>${i<=stageIndex?'✓ '+discoveries[i]:'🔒 '+discoveries[i]}</strong><small>${item.name} · 별 ${item.stars}개</small></li>`).join('')}</ol></details>
+ <details id="village-journal" class="quiz village-journal" ${journalOpen?'open':''}><summary id="journal-toggle">마을 수집 도감 · ${stageIndex+1}/${stages.length}</summary><ol>${stages.map((item,i)=>`<li class="${i<=stageIndex?'discovered':'undiscovered'}"><strong>${i<=stageIndex?'✓ '+discoveries[i]:'🔒 '+discoveries[i]}</strong><small>${item.name} · 별 ${item.stars}개</small><p class="discovery-story">${i<=stageIndex?stories[i]:'마을이 성장하면 새 이야기가 열려요.'}</p></li>`).join('')}</ol></details>
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
  if(preserveLand&&existingLand){existingLand.classList.remove('village-grown');root.querySelector('.land')?.replaceWith(existingLand);}
  if(existingFeedback){
