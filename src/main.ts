@@ -17,6 +17,7 @@ let gardenCount=0;
 let gardenGroups=1;
 let gardenOpen=false;
 let feedback='';
+let storageConflict=false;
 let finished=false;
 let saving=false;
 let sessionCompleted=0;
@@ -101,6 +102,7 @@ function render(){
  <div class="choices${q.skillId==='korean.sentence.2'||q.skillId==='korean.reading.3'?' sentence-bridge':''}${q.skillId==='korean.word.1'?' word-forest':''}">${q.choices.map((c,i)=>`<button class="choice" data-answer="${i}" ${finished?'disabled':''}>${q.skillId==='korean.word.1'?'<span class="word-leaf" aria-hidden="true">🍃</span>':''}${escape(c)}</button>`).join('')}</div>
  <button class="hint" id="hint" ${finished?'disabled':''}>💡 생각 도우미</button>
  <p class="feedback" role="status" aria-live="polite">${escape(feedback)}</p>
+ ${storageConflict?'<button type="button" id="reload-records" class="hint">최신 학습 기록 불러오기</button>':''}
  <button id="next" class="next">${finished?'다음 문제로 →':'다른 문제 풀기 ↻'}</button></section>`:''}
  <details id="village-journal" class="quiz village-journal" ${journalOpen?'open':''}><summary id="journal-toggle">마을 수집 도감 · ${stageIndex+1}/${stages.length}</summary><ol>${stages.map((item,i)=>`<li class="${i<=stageIndex?'discovered':'undiscovered'}"><strong>${i<=stageIndex?'✓ '+discoveries[i]:'🔒 '+discoveries[i]}</strong><small>${item.name} · 별 ${item.stars}개</small><p class="discovery-story">${i<=stageIndex?stories[i]:'마을이 성장하면 새 이야기가 열려요.'}</p><button type="button" class="building-select" id="building-${i}" data-building="${i}" aria-pressed="${selectedBuilding===i}" ${i>stageIndex?'disabled':''}>${i>stageIndex?'잠김':selectedBuilding===i?'선택됨':'선택하기'}</button></li>`).join('')}</ol></details>
  <details id="village-builder" class="quiz village-builder" ${builderOpen?'open':''}><summary id="builder-toggle">🏡 나만의 마을 꾸미기</summary><div class="builder-palette" aria-label="건축물 선택">${discoveries.slice(0,stageIndex+1).map((name,i)=>`<button type="button" id="palette-${i}" data-building="${i}" aria-pressed="${selectedBuilding===i}" class="building-select"><span aria-hidden="true">${buildingIcons[i]}</span> ${name}</button>`).join('')}</div><p class="building-preview" role="status">선택한 건축물: ${discoveries[selectedBuilding]} · 빈 칸이나 건물을 눌러 배치해요.</p><div class="building-slots" aria-label="나만의 마을">${villageSlots.map((building,i)=>`<button type="button" id="slot-${i}" data-slot="${i}" ${!villageSnapshot.readable?'disabled':''} aria-label="${i+1}번 자리: ${building===null?'빈 칸':discoveries[building]}">${building===null?'＋':building>stageIndex?'🔒':buildingIcons[building]}<small>${building===null?'빈 칸':discoveries[building]}</small></button>`).join('')}</div><div class="building-actions"><button type="button" id="building-undo" ${previousSlots&&villageSnapshot.readable?'':'disabled'}>되돌리기</button><button type="button" id="building-reset" ${!villageSnapshot.readable||villageSlots.every(v=>v===null)?'disabled':''}>비우기</button></div><p class="building-preview" role="status">${escape(villageNotice)}</p></details>
@@ -124,7 +126,7 @@ function render(){
   const result=await saveStateSafely(localStorage,state,next,navigator.locks);
   saving=false;
   if(result==='saved'){state=next;expeditionCompleted=0;selected=null;chooseQuestion();}
-  else feedback=result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 시도해 주세요.':'저장에 실패했어요. 브라우저 저장 공간을 확인해 주세요.';
+  else {if(result==='conflict')storageConflict=true;feedback=result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 시도해 주세요.':'저장에 실패했어요. 브라우저 저장 공간을 확인해 주세요.';}
   render();
  });
  root.querySelector('#hint')?.addEventListener('click',()=>{if(!q||finished||saving)return;usedHint=true;feedback=q.hint;render();});
@@ -141,6 +143,7 @@ function render(){
   root.querySelector('#'+id)?.addEventListener('click',()=>{if(saving||finished||q?.subject!=='math')return;gardenOpen=true;gardenCount=delta===0?0:Math.max(0,Math.min(36,gardenCount+delta));render();});
  }
  root.querySelector('#expedition-toggle')?.addEventListener('click',()=>{if(saving)return;expedition=!expedition;expeditionCompleted=0;render();});
+ root.querySelector('#reload-records')?.addEventListener('click',()=>{if(!saving)window.location.reload();});
  root.querySelector('#next')?.addEventListener('click',()=>{if(saving)return;chooseQuestion();render();root.querySelector<HTMLElement>('#question-heading')?.focus();});
  root.querySelectorAll<HTMLButtonElement>('[data-answer]').forEach(b=>b.addEventListener('click',async ()=>{
   if(!q||!tutor||finished||saving)return;
@@ -154,6 +157,7 @@ function render(){
    const gained=next.stars>state.stars;
    const result=await saveStateSafely(localStorage,state,next,navigator.locks);
    const saved=result==='saved';
+   if(result==='conflict')storageConflict=true;
    if(saved){state=next;sessionCompleted++;if(expedition)expeditionCompleted++;sound(gained?'coin':'confirm');}
    saving=false;
    finished=true;
@@ -163,6 +167,7 @@ function render(){
    const next=recordAttempt(state,q,answer,true,new Date());
    const result=await saveStateSafely(localStorage,state,next,navigator.locks);
    const saved=result==='saved';
+   if(result==='conflict')storageConflict=true;
    if(saved){state=next;sessionCompleted++;if(expedition)expeditionCompleted++;}
    saving=false;
    finished=true;
@@ -177,7 +182,8 @@ function render(){
 }
 window.addEventListener('storage',event=>{
  if(event.key===VILLAGE_KEY){villageSnapshot={...villageSnapshot,readable:false};previousSlots=null;villageNotice='다른 탭에서 건축 기록이 변경됐어요. 새로고침해 주세요.';render();}
- if(event.key===STORAGE_KEY){
+ if(event.key===STORAGE_KEY||event.key===null){
+  storageConflict=true;
   feedback='다른 탭에서 학습 기록이 변경됐어요. 최신 기록을 불러오려면 새로고침해 주세요.';
   render();
  }
