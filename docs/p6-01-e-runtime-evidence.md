@@ -1,0 +1,3 @@
+# P6-01-E runtime evidence
+Node v22.16.0, npm 10.9.2, tsc 5.8.3. Git ls-remote failed: could not resolve host github.com. Chromium executable exists; no browser test executed.
+Actual command: node --experimental-strip-types --test tests/village-storage.test.ts in /tmp/study-offline. 5 passed, 0 failed, 291.158067 ms. git hash-object confirmed source 967d0ea43fefbc018687d9a9ae95de0b87db4f85 and test b2e8da2f2b6cff915f0ad287bf348cc2fd35add9, matching previously fetched GitHub blobs. This is fresh evidence, not retrospective verification of prior P4-08/P5-09 execution claims. Full build, current learning tests, CI, browser and deployment remain unverified. Preserve main and Pages.
