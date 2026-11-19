@@ -17,7 +17,10 @@ export function saveStateIfUnchanged(storage:Pick<Storage,'getItem'|'setItem'>,e
  try{
   const current=parseState(storage.getItem(STORAGE_KEY));
   if(current&&JSON.stringify(current)!==JSON.stringify(expected))return 'conflict';
-  if(!current&&storage.getItem(STORAGE_KEY)!==null)return 'conflict';
+  if(!current){
+   if(storage.getItem(STORAGE_KEY)!==null)return 'conflict';
+   if(JSON.stringify(expected)!==JSON.stringify(createState(expected.grade)))return 'conflict';
+  }
   storage.setItem(STORAGE_KEY,JSON.stringify(next));
   return 'saved';
  }catch{return 'error';}
