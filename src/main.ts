@@ -58,7 +58,7 @@ function render(){
  else if(focusAnswer!==null&&focusAnswer!==undefined)root.querySelector<HTMLButtonElement>(`[data-answer="${focusAnswer}"]`)?.focus();
  else if(focusId)root.querySelector<HTMLElement>(`#${focusId}`)?.focus();
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
-  if(saving)return;
+  if(saving){(e.target as HTMLSelectElement).value=String(state.grade);return;}
   saving=true;
   const n=Number((e.target as HTMLSelectElement).value) as Grade;
   const next={...state,grade:n};
@@ -68,8 +68,8 @@ function render(){
   else feedback=result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 시도해 주세요.':'저장에 실패했어요. 브라우저 저장 공간을 확인해 주세요.';
   render();
  });
- root.querySelector('#hint')?.addEventListener('click',()=>{if(!q||finished)return;usedHint=true;feedback=q.hint;render();});
- root.querySelector('#next')?.addEventListener('click',()=>{chooseQuestion();render();});
+ root.querySelector('#hint')?.addEventListener('click',()=>{if(!q||finished||saving)return;usedHint=true;feedback=q.hint;render();});
+ root.querySelector('#next')?.addEventListener('click',()=>{if(saving)return;chooseQuestion();render();});
  root.querySelectorAll<HTMLButtonElement>('[data-answer]').forEach(b=>b.addEventListener('click',async ()=>{
   if(!q||!tutor||finished||saving)return;
   const answer=q.choices[Number(b.dataset.answer)];
@@ -92,6 +92,7 @@ function render(){
    const result=await saveStateSafely(localStorage,state,next,navigator.locks);
    const saved=result==='saved';
    if(saved)state=next;
+   saving=false;
    finished=true;
    feedback=saved?step.message:result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 풀어 주세요.':'저장에 실패했어요. 학습 기록은 반영되지 않았어요.';
   }else{

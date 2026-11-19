@@ -14,11 +14,12 @@ try{
  assert.ok(ready,'root-path preview did not start');
  browser=await chromium.launch({headless:true});
  const errors=[];
- browser.on('context',context=>context.on('page',page=>{
+ const track=page=>{
   page.on('pageerror',error=>errors.push(error.message));
   page.on('response',response=>{if(response.status()>=400)errors.push(response.status()+' '+response.url());});
- }));
- const page=await browser.newPage();
+  return page;
+ };
+ const page=track(await browser.newPage());
  await page.addInitScript(()=>{Math.random=()=>0;});
  await page.goto('http://127.0.0.1:'+port+'/');
  await page.locator('h1').filter({hasText:/지식 탐험대/}).waitFor();
@@ -35,7 +36,7 @@ try{
  assert.match(await page.locator('.stars').innerText(),/1개/);
  await page.reload();
  assert.match(await page.locator('.stars').innerText(),/1개/);
- const hintPage=await browser.newPage();
+ const hintPage=track(await browser.newPage());
  await hintPage.addInitScript(()=>{Math.random=()=>0;});
  await hintPage.goto('http://127.0.0.1:'+port+'/');
  await hintPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
@@ -57,7 +58,7 @@ try{
  await hintPage.reload();
  assert.match(await hintPage.locator('.stars').innerText(),/0개/);
  await hintPage.close();
- const gradePage=await browser.newPage();
+ const gradePage=track(await browser.newPage());
  await gradePage.goto('http://127.0.0.1:'+port+'/');
  await gradePage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
  await gradePage.locator('#grade').focus();
@@ -69,7 +70,7 @@ try{
  await gradePage.reload();
  assert.equal(await gradePage.locator('#grade').inputValue(),'2','selected grade must survive reload');
  await gradePage.close();
- const nextPage=await browser.newPage();
+ const nextPage=track(await browser.newPage());
  await nextPage.goto('http://127.0.0.1:'+port+'/');
  await nextPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
  await nextPage.locator('#next').focus();
@@ -79,7 +80,7 @@ try{
  assert.equal(await nextPage.locator('[data-answer]:not([disabled])').count(),3,'next question must have enabled answers');
  assert.equal(await nextPage.locator('.feedback').innerText(),'','new question must clear prior feedback');
  await nextPage.close();
- const conflictPage=await browser.newPage();
+ const conflictPage=track(await browser.newPage());
  await conflictPage.goto('http://127.0.0.1:'+port+'/');
  await conflictPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
  await conflictPage.locator('#hint').focus();
@@ -89,8 +90,9 @@ try{
  assert.equal(await conflictPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after cross-tab storage notice');
  await conflictPage.close();
  const sharedContext=await browser.newContext();
- const reader=await sharedContext.newPage();
- const writer=await sharedContext.newPage();
+ const reader=track(await sharedContext.newPage());
+ const writer=track(await sharedContext.newPage());
+ await reader.addInitScript(()=>{Math.random=()=>0;});
  await reader.goto('http://127.0.0.1:'+port+'/');
  await writer.goto('http://127.0.0.1:'+port+'/');
  await reader.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
@@ -101,15 +103,18 @@ try{
  await reader.locator('#hint:focus').waitFor();
  assert.equal(await reader.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'real cross-tab change must preserve live feedback node');
  assert.equal(await reader.locator('#grade').inputValue(),'1','stale tab must not silently overwrite its visible grade');
+ const beforeConflict=await writer.evaluate(()=>localStorage.getItem('study-game-state-v1'));
+ assert.equal(await reader.locator('[data-answer]').nth(1).innerText(),'7');
  await reader.locator('[data-answer]').nth(1).click();
  await reader.waitForFunction(()=>document.querySelector('.feedback')?.textContent?.includes('새로고침 후 다시 풀어 주세요.')||document.querySelector('.feedback')?.textContent?.includes('저장에 실패했어요.'),null,{timeout:5000});
  assert.match(await reader.locator('.feedback').innerText(),/다른 탭에서 기록이 변경됐어요/,'stale write must be rejected with a conflict notice');
  assert.equal(await reader.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')).grade),2,'stale answer must not overwrite newer grade');
  assert.equal(await reader.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')).attempts.length),0,'stale answer must not append an attempt');
+ assert.equal(await reader.evaluate(()=>localStorage.getItem('study-game-state-v1')),beforeConflict,'stale write must preserve exact serialized state');
  await reader.reload();
  assert.equal(await reader.locator('#grade').inputValue(),'2','stale tab must load writer grade after reload');
  await sharedContext.close();
- const wrongPage=await browser.newPage();
+ const wrongPage=track(await browser.newPage());
  await wrongPage.addInitScript(()=>{Math.random=()=>0;});
  await wrongPage.goto('http://127.0.0.1:'+port+'/');
  await wrongPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
@@ -141,11 +146,15 @@ try{
  assert.equal(await wrongPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'feedback live region must survive advancing from wrong answer');
  assert.equal(wrong.attempts[0].correct,false,'third wrong answer must be recorded as incorrect');
  assert.equal(wrong.attempts[0].usedHint,true,'tutored incorrect attempt must record hint usage');
+ assert.equal(await wrongPage.locator('[data-answer]').nth(1).innerText(),'토끼');
+ await wrongPage.locator('[data-answer]').nth(1).click();
+ await wrongPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
  await wrongPage.reload();
- assert.match(await wrongPage.locator('.stars').innerText(),/0개/);
+ assert.match(await wrongPage.locator('.stars').innerText(),/1개/);
  const persistedWrong=await wrongPage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')));
- assert.equal(persistedWrong.attempts.length,1,'incorrect attempt must survive reload');
+ assert.equal(persistedWrong.attempts.length,2,'incorrect attempt must survive reload');
  assert.equal(persistedWrong.attempts[0].correct,false);
+ assert.equal(persistedWrong.attempts[1].correct,true);
  await wrongPage.close();
  assert.deepEqual(errors,[],'root preview console/network errors');
  console.log('PASS root preview loads without errors; correct reward persists; hinted/wrong answers do not grant stars');
