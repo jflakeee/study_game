@@ -598,8 +598,8 @@ export const extendedQuestions: Question[] = [
       "시계"
     ],
     "answer": "당근",
-    "hint": "어떤 종류의 낱말인지 생각해요.",
-    "explanation": "당근이(가) 알맞은 낱말이에요."
+    "hint": "땅에서 자라고 먹을 수 있는 것을 찾아요.",
+    "explanation": "당근은 뿌리를 먹는 채소예요."
   },
   {
     "id": "k1-word-8",
@@ -628,8 +628,8 @@ export const extendedQuestions: Question[] = [
       "구름"
     ],
     "answer": "손",
-    "hint": "어떤 종류의 낱말인지 생각해요.",
-    "explanation": "손이(가) 알맞은 낱말이에요."
+    "hint": "우리 몸에 붙어 있는 것을 찾아요.",
+    "explanation": "손은 우리 몸의 한 부분이에요."
   },
   {
     "id": "k1-word-10",
@@ -658,8 +658,8 @@ export const extendedQuestions: Question[] = [
       "지우개"
     ],
     "answer": "지우개",
-    "hint": "어떤 종류의 낱말인지 생각해요.",
-    "explanation": "지우개이(가) 알맞은 낱말이에요."
+    "hint": "글씨를 쓰거나 지울 때 쓰는 물건을 찾아요.",
+    "explanation": "지우개는 글씨를 지우는 문구예요."
   },
   {
     "id": "k1-word-12",
@@ -673,8 +673,8 @@ export const extendedQuestions: Question[] = [
       "물고기"
     ],
     "answer": "나비",
-    "hint": "어떤 종류의 낱말인지 생각해요.",
-    "explanation": "나비이(가) 알맞은 낱말이에요."
+    "hint": "다리가 여섯 개인 작은 동물을 생각해요.",
+    "explanation": "나비는 다리가 여섯 개인 곤충이에요."
   },
   {
     "id": "k2-sentence-7",
