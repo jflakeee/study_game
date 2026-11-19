@@ -366,15 +366,15 @@ export const extendedQuestions: Question[] = [
     "grade": 1,
     "subject": "math",
     "skillId": "math.add.10",
-    "prompt": "4 + 4 = ?",
+    "prompt": "2 + 7 = ?",
     "choices": [
-      "9",
       "8",
-      "7"
+      "9",
+      "10"
     ],
-    "answer": "8",
-    "hint": "4부터 4칸 더 세어요.",
-    "explanation": "4 + 4 = 8예요."
+    "answer": "9",
+    "hint": "2부터 일곱 칸 더 세어요.",
+    "explanation": "2 + 7 = 9예요."
   },
   {
     "id": "m1-add-11",
@@ -606,15 +606,15 @@ export const extendedQuestions: Question[] = [
     "grade": 1,
     "subject": "korean",
     "skillId": "korean.word.1",
-    "prompt": "악기를 골라요.",
+    "prompt": "날씨를 나타내는 낱말을 골라요.",
     "choices": [
       "우산",
-      "감자",
-      "피아노"
+      "맑음",
+      "감자"
     ],
-    "answer": "피아노",
-    "hint": "어떤 종류의 낱말인지 생각해요.",
-    "explanation": "피아노이(가) 알맞은 낱말이에요."
+    "answer": "맑음",
+    "hint": "하늘의 상태를 나타내는 낱말을 찾아요.",
+    "explanation": "맑음은 날씨를 나타내는 낱말이에요."
   },
   {
     "id": "k1-word-9",
@@ -636,15 +636,15 @@ export const extendedQuestions: Question[] = [
     "grade": 1,
     "subject": "korean",
     "skillId": "korean.word.1",
-    "prompt": "옷을 골라요.",
+    "prompt": "신발의 종류를 골라요.",
     "choices": [
-      "기차",
-      "바지",
-      "사과"
+      "운동화",
+      "사과",
+      "기차"
     ],
-    "answer": "바지",
-    "hint": "어떤 종류의 낱말인지 생각해요.",
-    "explanation": "바지이(가) 알맞은 낱말이에요."
+    "answer": "운동화",
+    "hint": "발에 신고 움직이는 물건을 떠올려요.",
+    "explanation": "운동화는 신발의 한 종류예요."
   },
   {
     "id": "k1-word-11",
