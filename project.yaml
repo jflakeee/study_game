@@ -1,0 +1,17 @@
+# CCGS onboarding configuration; existing game adoption.
+schema_version: 1
+framework:
+  version: 1.3.0
+  last_upgraded: 2026-11-19
+project:
+  name: Study Game
+  # Initial formal documentation stage; existing playable code is in QA.
+  stage: Concept
+  goal: mobile
+engine:
+  name: Web
+  code_root: src
+  test_root: tests
+modes:
+  rigor: standard
+  automation: autonomous
