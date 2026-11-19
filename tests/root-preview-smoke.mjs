@@ -308,6 +308,10 @@ try{
  await miniPage.locator('#garden-toggle').waitFor();
  assert.equal(await miniPage.locator('#number-garden [role=status]').textContent(),'사과 0개');
  assert.equal(await miniPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await miniPage.locator('#grade').selectOption('2');
+ await miniPage.locator('.subject').filter({hasText:'2학년'}).waitFor();
+ await miniPage.locator('.expedition-status').filter({hasText:'0/3'}).waitFor();
+ assert.match(await miniPage.locator('.stars').innerText(),/2개/);
  await miniPage.close();
  assert.deepEqual(errors,[],'root preview console/network errors');
  console.log('PASS root preview loads without errors; correct reward persists; hinted/wrong answers do not grant stars');
