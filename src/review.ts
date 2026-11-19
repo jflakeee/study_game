@@ -10,4 +10,4 @@ export function scheduleReview(previous: Review | undefined, skillId: string, ra
   const dueAt = new Date(now.getTime()+intervalDays*86400000).toISOString();
   return {skillId,repetitions,intervalDays,dueAt,lastRating:rating};
 }
-export function isDue(review: Review | undefined, now: Date): boolean { return !review || new Date(review.dueAt).getTime() <= now.getTime(); }
+export function isDue(review: Review | undefined, now: Date): boolean { if (!review) return true; const due=Date.parse(review.dueAt); return !Number.isFinite(due) || review.intervalDays < 1 || review.intervalDays > 30 || due <= now.getTime() || due > now.getTime()+30*86400000; }
