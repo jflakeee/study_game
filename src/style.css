@@ -19,3 +19,18 @@ button,select{touch-action:manipulation}
 
 /* Ensure native grade selector meets the 44px mobile touch target. */
 .toolbar select{min-height:44px}
+
+/* P1-01: compact mobile chrome; preserve readable text and touch targets. */
+@media(max-width:560px){
+ .shell{padding:12px 12px 24px}
+ h1{font-size:clamp(26px,7vw,34px);margin:6px 0}
+ header p{margin:4px 0 8px}
+ .toolbar,.quiz,.village{margin-top:10px;padding:14px;border-radius:16px}
+ .land{min-height:0;padding:6px 0;font-size:28px}
+ .quiz h2{min-height:0;margin:8px 0 12px;font-size:clamp(19px,5.7vw,24px)}
+ .quiz p{margin:6px 0;line-height:1.5}
+ .choices{gap:8px}
+ .choice{min-height:56px;padding:8px;overflow-wrap:anywhere}
+ .hint,.next{margin-top:10px}
+ footer{margin-top:16px}
+}
