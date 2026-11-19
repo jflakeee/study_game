@@ -20,6 +20,8 @@ let feedback='';
 let finished=false;
 let saving=false;
 let sessionCompleted=0;
+let expedition=false;
+let expeditionCompleted=0;
 let selectedBuilding=0;
 let selectedRegion=0;
 let villageSnapshot=loadVillage(localStorage);
@@ -45,8 +47,10 @@ function villageArt(level:number){
 }
 function chooseQuestion(){
  const all=questionsFor(state.grade);
- const due=all.filter(q=>isDue(state.reviews[q.skillId],new Date()));
- const eligible=due.length?due:all;
+ const themed=expedition&&selected?all.filter(q=>q.subject!==selected?.subject):all;
+ const available=themed.length?themed:all;
+ const due=available.filter(q=>isDue(state.reviews[q.skillId],new Date()));
+ const eligible=due.length?due:available;
  const alternatives=eligible.filter(q=>q.id!==selected?.id);
  const pool=alternatives.length?alternatives:eligible;
  selected=pool[Math.floor(Math.random()*pool.length)]??null;
@@ -90,7 +94,7 @@ function render(){
  <section class="toolbar"><label for="grade">학년 선택</label><select id="grade">${[1,2,3].map(n=>`<option value="${n}" ${state.grade===n?'selected':''}>${n}학년</option>`).join('')}</select><button type="button" id="sound" aria-pressed="${soundEnabled}" aria-label="효과음" class="hint">${soundEnabled?'🔊 소리 켜짐':'🔇 소리 꺼짐'}</button><span class="stars" aria-live="polite">⭐ ${state.stars}개</span></section>
  <section class="village" aria-label="마을 성장"><div class="land${grew?' village-grown':''}" data-stage="${stageIndex}" aria-hidden="true">${preserveLand?'':villageArt(stageIndex)}</div><strong>Lv. ${stageIndex+1} · ${stage.name}</strong><div class="village-progress">${nextStage?`<label for="village-growth">다음 성장까지 별 ${nextStage.stars-state.stars}개</label><progress id="village-growth" value="${state.stars-stage.stars}" max="${nextStage.stars-stage.stars}"></progress>`:'모든 마을 성장 단계 달성!'}</div><small>학습 기록: ${answered}문제 · 정답 ${success}개</small></section>
  <section class="quiz" aria-label="개념별 학습 현황"><h2>📚 오늘의 복습 · ${dueCount}개 개념</h2>${progress.map(p=>`<div class="concept-progress"><label for="mastery-${escape(p.concept.id)}">${p.concept.subject==='math'?'🔢':'📖'} ${escape(p.concept.title)} · 숙련도 ${p.level}/5</label><progress id="mastery-${escape(p.concept.id)}" value="${p.level}" max="5"></progress><small>${p.due?'지금 복습':'다음 복습 '+escape(new Date(p.dueAt!).toLocaleDateString('ko-KR'))}</small><span class="mastery-goal">${p.level>=5?'🏅 숙련 목표 달성 · 꾸준히 복습해요!':`🎯 다음 목표: 숙련도 ${p.level+1}/5 · ${p.due?'복습에 도전해요.':'다음 복습 때 다시 도전해요.'}`}</span></div>`).join('')}</section>
- ${q?`<section class="quiz quest" aria-label="학습 퀘스트"><div class="quest-kicker">오늘의 탐험</div><div class="session-goal"><label for="session-goal-progress">이번 학습 목표 · ${Math.min(sessionCompleted,sessionGoal)}/${sessionGoal}문제</label><progress id="session-goal-progress" value="${Math.min(sessionCompleted,sessionGoal)}" max="${sessionGoal}"></progress><small>${sessionCompleted>=sessionGoal?'🎉 목표 달성! 더 풀거나 쉬어도 좋아요.':'틀려도 끝까지 도전하면 인정돼요.'}</small></div><div class="subject">${q.subject==='math'?'🔢 수학':'📖 국어'} · ${state.grade}학년 · ${escape(concept?.title??'학습')}</div><h2 id="question-heading" tabindex="-1">${escape(q.prompt)}</h2>
+ ${q?`<section class="quiz quest" aria-label="학습 퀘스트"><div class="quest-kicker">오늘의 탐험</div><button type="button" class="hint expedition-toggle" id="expedition-toggle" aria-pressed="${expedition}">${expedition?'🧭 종합 탐험 종료':'🧭 종합 탐험 시작'}</button>${expedition?`<p class="expedition-status" role="status">종합 탐험 · ${Math.min(expeditionCompleted,3)}/3 · ${expeditionCompleted>=3?'탐험 완료! 쉬어도 좋아요.':'다음 문제부터 수학과 국어를 번갈아 풀어요.'}</p>`:''}<div class="session-goal"><label for="session-goal-progress">이번 학습 목표 · ${Math.min(sessionCompleted,sessionGoal)}/${sessionGoal}문제</label><progress id="session-goal-progress" value="${Math.min(sessionCompleted,sessionGoal)}" max="${sessionGoal}"></progress><small>${sessionCompleted>=sessionGoal?'🎉 목표 달성! 더 풀거나 쉬어도 좋아요.':'틀려도 끝까지 도전하면 인정돼요.'}</small></div><div class="subject">${q.subject==='math'?'🔢 수학':'📖 국어'} · ${state.grade}학년 · ${escape(concept?.title??'학습')}</div><h2 id="question-heading" tabindex="-1">${escape(q.prompt)}</h2>
  ${q.subject==='math'?`<details id="number-garden" class="number-garden" ${gardenOpen?'open':''}><summary id="garden-toggle">🍎 숫자 정원 · 직접 세어 보기</summary><p>사과를 더하거나 빼면서 답을 생각해요. 정답은 아래에서 선택해요.</p><div class="garden-apples garden-groups" aria-hidden="true">${Array.from({length:gardenGroups},(_,i)=>`<span>${'🍎'.repeat(Math.floor(gardenCount/gardenGroups)+(i<gardenCount%gardenGroups?1:0))||'빈 바구니'}</span>`).join('')}</div>${state.grade>1?`<div class="garden-controls"><button type="button" id="group-minus" ${finished||gardenGroups===1?'disabled':''}>바구니 −</button><button type="button" id="group-plus" ${finished||gardenGroups===9?'disabled':''}>바구니 ＋</button></div><p>바구니 ${gardenGroups}개 · 사과를 골고루 나눠요.</p>`:''}<p role="status">사과 ${gardenCount}개</p><div class="garden-controls"><button type="button" id="garden-minus" ${finished||gardenCount===0?'disabled':''}>− 1</button><button type="button" id="garden-plus" ${finished||gardenCount>=36?'disabled':''}>＋ 1</button><button type="button" id="garden-clear" ${finished||gardenCount===0?'disabled':''}>비우기</button></div></details>`:''}
  ${q.skillId==='korean.word.1'?'<div class="word-forest-banner"><span aria-hidden="true">🌳 🍃 🌳</span><strong>낱말의 숲</strong><small>문제에 맞는 낱말을 찾아요.</small></div>':''}
  ${q.skillId==='korean.sentence.2'||q.skillId==='korean.reading.3'?`<div class="sentence-bridge-banner"><span aria-hidden="true">🌳 🌉 🌳</span><strong>${q.skillId==='korean.sentence.2'?'문장의 다리 · 까닭 찾기':'문장의 다리 · 중심 내용 찾기'}</strong><small>문장을 읽고 알맞은 답을 골라요.</small></div>`:''}
@@ -136,6 +140,7 @@ function render(){
  for(const [id,delta] of [['garden-plus',1],['garden-minus',-1],['garden-clear',0]] as const){
   root.querySelector('#'+id)?.addEventListener('click',()=>{if(saving||finished||q?.subject!=='math')return;gardenOpen=true;gardenCount=delta===0?0:Math.max(0,Math.min(36,gardenCount+delta));render();});
  }
+ root.querySelector('#expedition-toggle')?.addEventListener('click',()=>{if(saving)return;expedition=!expedition;expeditionCompleted=0;render();});
  root.querySelector('#next')?.addEventListener('click',()=>{if(saving)return;chooseQuestion();render();root.querySelector<HTMLElement>('#question-heading')?.focus();});
  root.querySelectorAll<HTMLButtonElement>('[data-answer]').forEach(b=>b.addEventListener('click',async ()=>{
   if(!q||!tutor||finished||saving)return;
@@ -149,7 +154,7 @@ function render(){
    const gained=next.stars>state.stars;
    const result=await saveStateSafely(localStorage,state,next,navigator.locks);
    const saved=result==='saved';
-   if(saved){state=next;sessionCompleted++;sound(gained?'coin':'confirm');}
+   if(saved){state=next;sessionCompleted++;if(expedition)expeditionCompleted++;sound(gained?'coin':'confirm');}
    saving=false;
    finished=true;
    feedback=saved?'정답이에요! '+(gained?'⭐ 별 1개 획득! ':'')+step.message:result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 풀어 주세요.':'정답이지만 저장에 실패했어요. 별과 학습 기록은 반영되지 않았어요.';
@@ -158,7 +163,7 @@ function render(){
    const next=recordAttempt(state,q,answer,true,new Date());
    const result=await saveStateSafely(localStorage,state,next,navigator.locks);
    const saved=result==='saved';
-   if(saved){state=next;sessionCompleted++;}
+   if(saved){state=next;sessionCompleted++;if(expedition)expeditionCompleted++;}
    saving=false;
    finished=true;
    feedback=saved?step.message:result==='conflict'?'다른 탭에서 기록이 변경됐어요. 새로고침 후 다시 풀어 주세요.':'저장에 실패했어요. 학습 기록은 반영되지 않았어요.';
