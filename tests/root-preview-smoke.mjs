@@ -73,7 +73,9 @@ try{
  assert.equal(await gradePage.locator('#grade').inputValue(),'2','selected grade must survive reload');
  await gradePage.close();
  const nextPage=track(await browser.newPage());
+ await nextPage.addInitScript(()=>{Math.random=()=>0;});
  await nextPage.goto('http://127.0.0.1:'+port+'/');
+ const skippedPrompt=await nextPage.locator('.quiz h2').last().innerText();
  await nextPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
  await nextPage.locator('#next').focus();
  await nextPage.keyboard.press('Enter');
@@ -81,6 +83,7 @@ try{
  assert.equal(await nextPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after skipping to another question');
  assert.equal(await nextPage.locator('[data-answer]:not([disabled])').count(),3,'next question must have enabled answers');
  assert.equal(await nextPage.locator('.feedback').innerText(),'','new question must clear prior feedback');
+ assert.notEqual(await nextPage.locator('.quiz h2').last().innerText(),skippedPrompt,'skip must not repeat the previous question when alternatives exist');
  await nextPage.close();
  const conflictPage=track(await browser.newPage());
  await conflictPage.goto('http://127.0.0.1:'+port+'/');
