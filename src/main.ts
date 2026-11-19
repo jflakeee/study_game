@@ -181,7 +181,7 @@ function render(){
  }));
 }
 window.addEventListener('storage',event=>{
- if(event.key===VILLAGE_KEY){villageSnapshot={...villageSnapshot,readable:false};previousSlots=null;villageNotice='다른 탭에서 건축 기록이 변경됐어요. 새로고침해 주세요.';render();}
+ if(event.key===VILLAGE_KEY||event.key===null){villageSnapshot={...villageSnapshot,readable:false};previousSlots=null;villageNotice='다른 탭에서 건축 기록이 변경됐어요. 새로고침해 주세요.';render();}
  if(event.key===STORAGE_KEY||event.key===null){
   storageConflict=true;
   feedback='다른 탭에서 학습 기록이 변경됐어요. 최신 기록을 불러오려면 새로고침해 주세요.';
