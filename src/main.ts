@@ -193,6 +193,7 @@ function render(){
   sortSession=createSortSession(sortMissions[key]);
   sortSelectedItem=null;
   render();
+  root.querySelector<HTMLSelectElement>('#sort-career')?.focus();
  });
  root.querySelectorAll<HTMLButtonElement>('[data-sort-item]').forEach(button=>button.addEventListener('click',()=>{
   if(saving||sortSession.completed)return;
@@ -202,16 +203,19 @@ function render(){
  }));
  root.querySelectorAll<HTMLButtonElement>('[data-sort-group]').forEach(button=>button.addEventListener('click',()=>{
   if(saving||!sortSelectedItem||sortSession.completed)return;
-  sortSession=placeSortItem(sortMissions[sortCareer],sortSession,sortSelectedItem,button.dataset.sortGroup??'');
+  const group=button.dataset.sortGroup??'';
+  sortSession=placeSortItem(sortMissions[sortCareer],sortSession,sortSelectedItem,group);
   sortSelectedItem=null;
   render();
-  root.querySelector<HTMLButtonElement>('#sort-reset')?.focus();
+  if(sortSession.completed)root.querySelector<HTMLButtonElement>('#sort-reset')?.focus();
+  else root.querySelectorAll<HTMLButtonElement>('[data-sort-group]').forEach(bin=>{if(bin.dataset.sortGroup===group)bin.focus();});
  }));
  root.querySelector('#sort-reset')?.addEventListener('click',()=>{
   if(saving)return;
   sortSession=createSortSession(sortMissions[sortCareer]);
   sortSelectedItem=null;
   render();
+  root.querySelector<HTMLButtonElement>('#sort-reset')?.focus();
  });
  root.querySelector('#sound')?.addEventListener('click',()=>{soundEnabled=!soundEnabled;if(soundEnabled){try{unlockAudio();sound('click-soft');}catch{/* optional audio */}}render();});
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
