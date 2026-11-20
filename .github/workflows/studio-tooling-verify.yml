@@ -1,0 +1,29 @@
+name: Verify studio tooling branch
+on:
+  push:
+    branches:
+      - chore/studio-tooling-20261119
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: TypeScript and Vite build
+        run: npm run build
+      - name: Unit tests
+        run: npm test
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser smoke tests
+        run: npm run test:browser
+      - name: Root preview browser smoke
+        run: |
+          npm run build:preview
+          node tests/root-preview-smoke.mjs
