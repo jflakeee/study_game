@@ -111,6 +111,9 @@ try{
   await enlarged.close();
  }
  const sorting=await browser.newPage({viewport:{width:320,height:720}});
+ const sortingErrors=[];
+ sorting.on('pageerror',error=>sortingErrors.push(error.message));
+ sorting.on('console',message=>{if(message.type()==='error')sortingErrors.push(message.text());});
  await sorting.goto('http://127.0.0.1:'+port+'/study_game/');
  const sortStorage=await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1'));
  const sortPrompt=await sorting.locator('#question-heading').innerText();
@@ -140,6 +143,7 @@ try{
  assert.equal(await sorting.locator('#sort-career:focus').count(),1);
  assert.match(await sorting.locator('.sort-activity h3').innerText(),/건강센터/);
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'sorting at 320px must not overflow');
+ assert.deepEqual(sortingErrors,[],'sorting interactions must not cause browser errors');
  await sorting.close();
  console.log('PASS career sorting retry, completion, tab switching and learning storage isolation');
  const page=await browser.newPage();
