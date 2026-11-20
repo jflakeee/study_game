@@ -252,10 +252,12 @@ try{
  assert.equal(await growthPage.locator('.concept-progress progress').count(),2);
  assert.equal(await growthPage.locator('.mastery-goal').count(),2);
  assert.equal(await growthPage.locator('#session-goal-progress').getAttribute('value'),'0');
+ await growthPage.locator('[data-view="village"]').click();
  await growthPage.locator('#journal-toggle').click();
  assert.equal(await growthPage.locator('#village-journal li.discovered').count(),1);
  assert.equal(await growthPage.locator('#village-journal li.undiscovered').count(),8);
  assert.match(await growthPage.locator('#village-journal li.discovered .discovery-story').innerText(),/첫 책/);
+ await growthPage.locator('[data-view="learn"]').click();
  await growthPage.locator('[data-answer]').nth(1).click();
  await growthPage.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
  assert.equal(await growthPage.locator('#village-growth').getAttribute('value'),'1');
@@ -275,9 +277,11 @@ try{
  assert.match(await growthPage.locator('.village strong').innerText(),/Lv. 2/);
  assert.equal(await growthPage.locator('.village-grown').count(),0,'reload must not replay milestone celebration');
  assert.equal(await growthPage.locator('#session-goal-progress').getAttribute('value'),'0');
+ await growthPage.locator('[data-view="village"]').click();
  await growthPage.locator('#journal-toggle').click();
  assert.equal(await growthPage.locator('#village-journal li.discovered').count(),2);
  const learningBefore=await growthPage.evaluate(()=>localStorage.getItem('study-game-state-v1'));
+ await growthPage.locator('[data-view="village"]').click();
  await growthPage.locator('#builder-toggle').click();
  assert.equal(await growthPage.locator('.builder-palette button').count(),2);
  await growthPage.locator('#palette-1').click();
@@ -288,8 +292,10 @@ try{
  await growthPage.locator('#slot-0').click();
  await growthPage.locator('#slot-0').filter({hasText:'푸른 나무'}).waitFor();
  await growthPage.reload();
+ await growthPage.locator('[data-view="village"]').click();
  await growthPage.locator('#builder-toggle').click();
  await growthPage.locator('#slot-0').filter({hasText:'푸른 나무'}).waitFor();
+ await growthPage.locator('[data-view="explore"]').click();
  await growthPage.locator('#world-toggle').click();
  assert.equal(await growthPage.locator('[data-region]:not(:disabled)').count(),2);
  await growthPage.locator('#region-1').click();
