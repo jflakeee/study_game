@@ -23,6 +23,7 @@ let activeView:'learn'|'village'|'explore'='learn';
 let sortCareer='free';
 let sortSession:SortSession=createSortSession(sortMissions.free);
 let sortSelectedItem:string|null=null;
+let sortFeedback='';
 let finished=false;
 let saving=false;
 let sessionCompleted=0;
@@ -159,7 +160,7 @@ function render(){
   activity.innerHTML=`<h3>🧺 ${escape(mission.title)}</h3><p>${escape(mission.instruction)}</p>
    <label for="sort-career">탐험 역할 미리보기</label>
    <select id="sort-career">${Object.keys(sortMissions).map(key=>`<option value="${key}" ${key===sortCareer?'selected':''}>${escape(({doctor:'의사',lawyer:'변호사',police:'경찰',rescue:'119 구조대원',scientist:'과학자',president:'대통령',astronaut:'우주비행사',teacher:'교사',free:'자유 탐험'} as Record<string,string>)[key])}</option>`).join('')}</select>
-   <p role="status" class="sort-status">${result.completed?'🎉 분류 성공!':`정답 ${result.correct}/${result.total} · 물건을 선택한 다음 분류함을 누르세요.`}</p>
+   <p role="status" aria-live="polite" class="sort-status">${result.completed?'🎉 분류 성공!':`정답 ${result.correct}/${result.total} · ${escape(sortFeedback||'물건을 선택한 다음 분류함을 누르세요.')}`}</p>
    <div class="sort-items" aria-label="분류할 물건">${mission.items.map(item=>`<button type="button" data-sort-item="${escape(item.id)}" aria-pressed="${sortSelectedItem===item.id}" ${result.completed?'disabled':''}>${escape(item.label)}${sortSession.placements[item.id]?' · '+escape(sortSession.placements[item.id]):''}</button>`).join('')}</div>
    <div class="sort-groups" aria-label="분류함">${mission.groups.map(group=>`<button type="button" data-sort-group="${escape(group)}" ${result.completed?'disabled':''}>${escape(group)}</button>`).join('')}</div>
    <button type="button" id="sort-reset">다시 분류하기</button>`;
@@ -190,6 +191,7 @@ function render(){
   const key=(event.target as HTMLSelectElement).value;
   if(!Object.prototype.hasOwnProperty.call(sortMissions,key))return;
   sortCareer=key;
+  sortFeedback='';
   sortSession=createSortSession(sortMissions[key]);
   sortSelectedItem=null;
   render();
@@ -198,12 +200,15 @@ function render(){
  root.querySelectorAll<HTMLButtonElement>('[data-sort-item]').forEach(button=>button.addEventListener('click',()=>{
   if(saving||sortSession.completed)return;
   sortSelectedItem=button.dataset.sortItem??null;
+  sortFeedback='분류함을 골라 주세요.';
   render();
   root.querySelector<HTMLButtonElement>(`[data-sort-item="${sortSelectedItem}"]`)?.focus();
  }));
  root.querySelectorAll<HTMLButtonElement>('[data-sort-group]').forEach(button=>button.addEventListener('click',()=>{
   if(saving||!sortSelectedItem||sortSession.completed)return;
   const group=button.dataset.sortGroup??'';
+  const selected=sortMissions[sortCareer].items.find(item=>item.id===sortSelectedItem);
+  sortFeedback=selected?.group===group?'잘했어요! 다음 물건도 분류해 보세요.':'다시 생각해 보세요. 다른 분류함으로 옮길 수 있어요.';
   sortSession=placeSortItem(sortMissions[sortCareer],sortSession,sortSelectedItem,group);
   sortSelectedItem=null;
   render();
@@ -214,6 +219,7 @@ function render(){
   if(saving)return;
   sortSession=createSortSession(sortMissions[sortCareer]);
   sortSelectedItem=null;
+  sortFeedback='';
   render();
   root.querySelector<HTMLButtonElement>('#sort-reset')?.focus();
  });
