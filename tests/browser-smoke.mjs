@@ -48,6 +48,7 @@ try{
   const dimensions=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
   assert.ok(dimensions.scroll<=dimensions.client,'horizontal overflow at '+width+': '+JSON.stringify(dimensions));
   await page.locator('#grade').selectOption('2');
+  await page.waitForFunction(()=>document.querySelector('.subject')?.textContent?.includes('2학년'));
   await page.locator('.subject').waitFor();
   assert.match(await page.locator('.subject').innerText(),/2학년/);
   await page.locator('#hint').click();
