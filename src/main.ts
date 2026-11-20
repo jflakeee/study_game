@@ -198,12 +198,14 @@ function render(){
   if(saving||sortSession.completed)return;
   sortSelectedItem=button.dataset.sortItem??null;
   render();
+  root.querySelector<HTMLButtonElement>(`[data-sort-item="${sortSelectedItem}"]`)?.focus();
  }));
  root.querySelectorAll<HTMLButtonElement>('[data-sort-group]').forEach(button=>button.addEventListener('click',()=>{
   if(saving||!sortSelectedItem||sortSession.completed)return;
   sortSession=placeSortItem(sortMissions[sortCareer],sortSession,sortSelectedItem,button.dataset.sortGroup??'');
   sortSelectedItem=null;
   render();
+  root.querySelector<HTMLButtonElement>('#sort-reset')?.focus();
  }));
  root.querySelector('#sort-reset')?.addEventListener('click',()=>{
   if(saving)return;
