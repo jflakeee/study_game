@@ -150,6 +150,15 @@ try{
  for(const career of ['doctor','lawyer','police','rescue','scientist','president','astronaut','teacher','free']){
   await sorting.locator('#hidden-career').selectOption(career);
   assert.equal(await sorting.locator('[data-hidden-object]').count(),3,'three objects for '+career);
+  assert.equal(await sorting.locator('.hidden-scenery span').count(),4,'four decorative scene elements for '+career);
+  const sceneMetrics=await sorting.locator('.hidden-scene').evaluate(scene=>{
+   const area=scene.getBoundingClientRect();
+   const targets=[...scene.querySelectorAll('[data-hidden-object]')].map(el=>el.getBoundingClientRect());
+   return {inside:targets.every(t=>t.left>=area.left&&t.right<=area.right&&t.top>=area.top&&t.bottom<=area.bottom),large:targets.every(t=>t.width>=44&&t.height>=44),overlap:targets.some((a,i)=>targets.slice(i+1).some(b=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top))};
+  });
+  assert.equal(sceneMetrics.inside,true,'hidden objects inside scene for '+career);
+  assert.equal(sceneMetrics.large,true,'hidden objects meet 44px touch target for '+career);
+  assert.equal(sceneMetrics.overlap,false,'hidden objects must not overlap for '+career);
  }
  await sorting.locator('#hidden-career').selectOption('astronaut');
  await sorting.locator('#hidden-hint').click();
