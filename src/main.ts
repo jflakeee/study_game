@@ -1,5 +1,5 @@
 import './style.css';
-import {puzzleMissions,createPuzzleSession,selectPuzzleTile,type PuzzleSession} from './puzzle-game.ts';
+import {puzzleMissions,puzzleForGrade,createPuzzleSession,selectPuzzleTile,type PuzzleSession} from './puzzle-game.ts';
 import {sortMissions,createSortSession,placeSortItem,checkSortSession,type SortSession} from './sort-game.ts';
 import {loadVillage,saveVillage,VILLAGE_KEY,emptySlots,type Slots} from './village-storage.ts';
 import {play,unlockAudio} from 'plinkfx';
@@ -168,7 +168,8 @@ function render(){
    <div class="sort-groups" aria-label="분류함">${mission.groups.map(group=>`<button type="button" data-sort-group="${escape(group)}" ${result.completed?'disabled':''}>${escape(group)}</button>`).join('')}</div>
    <button type="button" id="sort-reset">다시 분류하기</button>`;
   explorePanel.append(activity);
-  const puzzleMission=puzzleMissions[puzzleCareer]??puzzleMissions.free;
+  const puzzleMission=puzzleForGrade(puzzleMissions[puzzleCareer]??puzzleMissions.free,state.grade);
+  if(puzzleSession.missionId!==puzzleMission.id)puzzleSession=createPuzzleSession(puzzleMission);
   const puzzle=document.createElement('section');
   puzzle.className='quiz puzzle-activity';
   puzzle.setAttribute('aria-label','조각 퍼즐 미니게임');
@@ -242,21 +243,21 @@ function render(){
   const key=(event.target as HTMLSelectElement).value;
   if(!Object.prototype.hasOwnProperty.call(puzzleMissions,key))return;
   puzzleCareer=key;
-  puzzleSession=createPuzzleSession(puzzleMissions[key]);
+  puzzleSession=createPuzzleSession(puzzleForGrade(puzzleMissions[key],state.grade));
   render();
   root.querySelector<HTMLSelectElement>('#puzzle-career')?.focus();
  });
  root.querySelectorAll<HTMLButtonElement>('[data-puzzle-tile]').forEach(button=>button.addEventListener('click',()=>{
   if(saving||puzzleSession.completed)return;
   const id=button.dataset.puzzleTile??'';
-  puzzleSession=selectPuzzleTile(puzzleMissions[puzzleCareer],puzzleSession,id);
+  puzzleSession=selectPuzzleTile(puzzleForGrade(puzzleMissions[puzzleCareer],state.grade),puzzleSession,id);
   render();
   if(puzzleSession.completed)root.querySelector<HTMLButtonElement>('#puzzle-reset')?.focus();
   else root.querySelectorAll<HTMLButtonElement>('[data-puzzle-tile]').forEach(tile=>{if(tile.dataset.puzzleTile===id)tile.focus();});
  }));
  root.querySelector('#puzzle-reset')?.addEventListener('click',()=>{
   if(saving)return;
-  puzzleSession=createPuzzleSession(puzzleMissions[puzzleCareer]);
+  puzzleSession=createPuzzleSession(puzzleForGrade(puzzleMissions[puzzleCareer],state.grade));
   render();
   root.querySelector<HTMLButtonElement>('#puzzle-reset')?.focus();
  });
