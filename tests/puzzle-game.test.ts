@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {puzzleMissions,createPuzzleSession,selectPuzzleTile,validatePuzzleMission} from '../src/puzzle-game.ts';
+import {puzzleMissions,createPuzzleSession,selectPuzzleTile,validatePuzzleMission,puzzleForGrade} from '../src/puzzle-game.ts';
 for(const mission of Object.values(puzzleMissions)){
  test(mission.id+' solves by selecting two tiles to swap',()=>{
   const initial=createPuzzleSession(mission);
@@ -30,3 +30,15 @@ test('rejects invalid puzzle definitions',()=>{
  assert.throws(()=>validatePuzzleMission({...puzzleMissions.free,tiles:[]}));
  assert.throws(()=>validatePuzzleMission({...puzzleMissions.free,tiles:[...puzzleMissions.free.tiles.slice(0,3),puzzleMissions.free.tiles[0]]}));
 });
+
+for(const mission of Object.values(puzzleMissions)){
+ test(mission.id+' adapts to grade 1/2/3 without mutating canonical tiles',()=>{
+  for(const [grade,count] of [[1,4],[2,6],[3,9]] as const){
+   const adapted=puzzleForGrade(mission,grade);
+   assert.equal(adapted.tiles.length,count);
+   assert.equal(createPuzzleSession(adapted).order.length,count);
+   validatePuzzleMission(adapted);
+  }
+  assert.equal(mission.tiles.length,4);
+ });
+}
