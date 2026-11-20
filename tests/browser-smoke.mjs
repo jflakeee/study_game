@@ -32,6 +32,18 @@ try{
   }
   assert.equal(await page.locator('#question-heading').innerText(),initialQuestion);
   assert.equal(await page.evaluate(()=>localStorage.getItem('study-game-state-v1')),initialStorage);
+  await page.locator('[data-view="explore"]').click();
+  await page.locator('#hidden-career').selectOption('astronaut');
+  const hiddenGeometry=await page.locator('.hidden-scene').evaluate(scene=>{
+   const bounds=scene.getBoundingClientRect();
+   const items=[...scene.querySelectorAll('[data-hidden-object]')].map(item=>item.getBoundingClientRect());
+   return {contained:items.every(item=>item.left>=bounds.left&&item.right<=bounds.right&&item.top>=bounds.top&&item.bottom<=bounds.bottom),
+    minimumTouch:items.every(item=>item.width>=44&&item.height>=44),
+    noOverlap:items.every((item,i)=>items.slice(i+1).every(other=>item.right<=other.left||other.right<=item.left||item.bottom<=other.top||other.bottom<=item.top))};
+  });
+  assert.deepEqual(hiddenGeometry,{contained:true,minimumTouch:true,noOverlap:true},'hidden scene layout at '+width);
+  await page.screenshot({path:'test-artifacts/hidden-scene-'+width+'.png',fullPage:true});
+  await page.locator('[data-view="learn"]').click();
 
   const dimensions=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
   assert.ok(dimensions.scroll<=dimensions.client,'horizontal overflow at '+width+': '+JSON.stringify(dimensions));
