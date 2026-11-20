@@ -134,7 +134,7 @@ function render(){
    const item=shell.querySelector(selector);
    if(item)panel.append(item);
   }
-  toolbar.after(panel);
+  shell.querySelector('footer')?.before(panel);
   const button=document.createElement('button');
   button.type='button';
   button.className='mobile-nav-button';
