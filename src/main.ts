@@ -1,4 +1,5 @@
 import './style.css';
+import {hiddenMissions,createHiddenSession,findHiddenObject,type HiddenSession} from './hidden-game.ts';
 import {puzzleMissions,puzzleForGrade,createPuzzleSession,selectPuzzleTile,type PuzzleSession} from './puzzle-game.ts';
 import {sortMissions,createSortSession,placeSortItem,checkSortSession,type SortSession} from './sort-game.ts';
 import {loadVillage,saveVillage,VILLAGE_KEY,emptySlots,type Slots} from './village-storage.ts';
@@ -28,6 +29,9 @@ let sortFeedback='';
 let puzzleCareer='free';
 let puzzleSession:PuzzleSession=createPuzzleSession(puzzleMissions.free);
 let puzzleNotice='';
+let hiddenCareer='free';
+let hiddenSession:HiddenSession=createHiddenSession(hiddenMissions.free);
+let hiddenHint=false;
 let finished=false;
 let saving=false;
 let sessionCompleted=0;
@@ -181,6 +185,19 @@ function render(){
    <div class="puzzle-tiles" aria-label="순서를 맞출 퍼즐 조각">${puzzleSession.order.map((id,i)=>{const tile=puzzleMission.tiles.find(item=>item.id===id)!;return `<button type="button" data-puzzle-tile="${escape(id)}" aria-pressed="${puzzleSession.selected===id}" ${puzzleSession.completed?'disabled':''} aria-label="${i+1}번째 자리, ${escape(tile.label)}">${escape(tile.label)}</button>`;}).join('')}</div>
    <button type="button" id="puzzle-reset">퍼즐 다시 시작</button>`;
   explorePanel.append(puzzle);
+  const hiddenMission=hiddenMissions[hiddenCareer]??hiddenMissions.free;
+  const hidden=document.createElement('section');
+  hidden.className='quiz hidden-activity';
+  hidden.setAttribute('aria-label','물건 찾기 미니게임');
+  hidden.innerHTML=`<h3>🔎 ${escape(hiddenMission.title)}</h3><p>${escape(hiddenMission.scene)}에서 물건 세 개를 찾아 보세요.</p>
+   <label for="hidden-career">찾기 장소 선택</label>
+   <select id="hidden-career">${Object.keys(hiddenMissions).map(key=>`<option value="${key}" ${key===hiddenCareer?'selected':''}>${escape(({free:'자유 탐험',doctor:'의사',lawyer:'변호사',police:'경찰',rescue:'119 구조대원',scientist:'과학자',president:'대통령',astronaut:'우주비행사',teacher:'교사'} as Record<string,string>)[key])}</option>`).join('')}</select>
+   <p class="hidden-status" role="status" aria-live="polite">${hiddenSession.completed?'🎉 물건을 모두 찾았어요!':`찾은 물건 ${hiddenSession.found.length}/${hiddenMission.objects.length}`}</p>
+   <div class="hidden-scene" aria-label="물건 찾기 활동 공간">${hiddenMission.objects.map((object,i)=>`<button type="button" data-hidden-object="${escape(object.id)}" ${hiddenSession.found.includes(object.id)?'disabled':''} aria-label="${escape(object.label)} 찾기" class="hidden-object hidden-object-${i}">${hiddenSession.found.includes(object.id)?'✓ ':''}${escape(object.label)}</button>`).join('')}</div>
+   <button type="button" id="hidden-hint" aria-expanded="${hiddenHint}">힌트 ${hiddenHint?'닫기':'보기'}</button>
+   ${hiddenHint?`<ul class="hidden-hints">${hiddenMission.objects.filter(object=>!hiddenSession.found.includes(object.id)).map(object=>`<li>${escape(object.hint)}</li>`).join('')}</ul>`:''}
+   <button type="button" id="hidden-reset">다시 찾기</button>`;
+  explorePanel.append(hidden);
  }
  const recovery=shell.querySelector('#reload-records');
  if(recovery)toolbar.after(recovery);
@@ -265,6 +282,35 @@ function render(){
   puzzleNotice='';
   render();
   root.querySelector<HTMLButtonElement>('#puzzle-reset')?.focus();
+ });
+ root.querySelector<HTMLSelectElement>('#hidden-career')?.addEventListener('change',event=>{
+  if(saving)return;
+  const key=(event.target as HTMLSelectElement).value;
+  if(!Object.prototype.hasOwnProperty.call(hiddenMissions,key))return;
+  hiddenCareer=key;
+  hiddenSession=createHiddenSession(hiddenMissions[key]);
+  hiddenHint=false;
+  render();
+  root.querySelector<HTMLSelectElement>('#hidden-career')?.focus();
+ });
+ root.querySelectorAll<HTMLButtonElement>('[data-hidden-object]').forEach(button=>button.addEventListener('click',()=>{
+  if(saving||hiddenSession.completed)return;
+  hiddenSession=findHiddenObject(hiddenMissions[hiddenCareer],hiddenSession,button.dataset.hiddenObject??'');
+  render();
+  if(hiddenSession.completed)root.querySelector<HTMLButtonElement>('#hidden-reset')?.focus();
+  else root.querySelector<HTMLButtonElement>('#hidden-hint')?.focus();
+ }));
+ root.querySelector('#hidden-hint')?.addEventListener('click',()=>{
+  hiddenHint=!hiddenHint;
+  render();
+  root.querySelector<HTMLButtonElement>('#hidden-hint')?.focus();
+ });
+ root.querySelector('#hidden-reset')?.addEventListener('click',()=>{
+  if(saving)return;
+  hiddenSession=createHiddenSession(hiddenMissions[hiddenCareer]);
+  hiddenHint=false;
+  render();
+  root.querySelector<HTMLButtonElement>('#hidden-reset')?.focus();
  });
  root.querySelector('#sound')?.addEventListener('click',()=>{soundEnabled=!soundEnabled;if(soundEnabled){try{unlockAudio();sound('click-soft');}catch{/* optional audio */}}render();});
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
