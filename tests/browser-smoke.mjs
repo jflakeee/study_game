@@ -159,6 +159,8 @@ try{
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'sorting at 320px must not overflow');
  assert.deepEqual(sortingErrors,[],'sorting interactions must not cause browser errors');
  const puzzleStorage=await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1'));
+ const villageBeforeMinigames=await sorting.evaluate(()=>localStorage.getItem('study-game-village-v1'));
+
  for(const career of ['doctor','lawyer','police','rescue','scientist','president','astronaut','teacher','free']){
   await sorting.locator('#hidden-career').selectOption(career);
   assert.equal(await sorting.locator('[data-hidden-object]').count(),3,'three objects for '+career);
@@ -190,6 +192,13 @@ try{
  await sorting.locator('#hidden-reset').click();
  assert.equal(await sorting.locator('#hidden-reset:focus').count(),1,'restart focus must be restored');
  assert.match(await sorting.locator('.hidden-status').innerText(),/0\/3/);
+ assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-village-v1')),villageBeforeMinigames,'object finding must not alter village slots');
+ assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1')),puzzleStorage,'object finding reset must not alter learning progress');
+ await sorting.reload();
+ await sorting.locator('[data-view="explore"]').click();
+ assert.equal(await sorting.locator('#hidden-career').inputValue(),'astronaut','career selection remains in current browser session');
+ assert.match(await sorting.locator('.hidden-status').innerText(),/0\/3/,'reset state survives rerender after reload');
+ assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-village-v1')),villageBeforeMinigames,'reload preserves village save');
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'object finding at 320px must not overflow');
 
  const careerPuzzleNames=['doctor','lawyer','police','rescue','scientist','president','astronaut','teacher','free'];
