@@ -117,7 +117,9 @@ try{
  await sorting.locator('[data-view="explore"]').click();
  await sorting.locator('#sort-career').selectOption('astronaut');
  await sorting.locator('[data-sort-item="camera"]').click();
+ assert.equal(await sorting.locator('[data-sort-item="camera"]:focus').count(),1);
  await sorting.locator('[data-sort-group="식량"]').click();
+ assert.equal(await sorting.locator('[data-sort-group="식량"]:focus').count(),1);
  assert.match(await sorting.locator('.sort-status').innerText(),/정답 0\/3/);
  await sorting.locator('[data-sort-item="camera"]').click();
  await sorting.locator('[data-sort-group="탐사 도구"]').click();
@@ -132,8 +134,10 @@ try{
  assert.match(await sorting.locator('.sort-status').innerText(),/분류 성공/);
  assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1')),sortStorage,'minigame must not award study stars');
  await sorting.locator('#sort-reset').click();
+ assert.equal(await sorting.locator('#sort-reset:focus').count(),1);
  assert.match(await sorting.locator('.sort-status').innerText(),/정답 0\/3/);
  await sorting.locator('#sort-career').selectOption('doctor');
+ assert.equal(await sorting.locator('#sort-career:focus').count(),1);
  assert.match(await sorting.locator('.sort-activity h3').innerText(),/건강센터/);
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'sorting at 320px must not overflow');
  await sorting.close();
