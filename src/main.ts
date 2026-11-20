@@ -1,4 +1,5 @@
 import './style.css';
+import {sortMissions,createSortSession,placeSortItem,checkSortSession,type SortSession} from './sort-game.ts';
 import {loadVillage,saveVillage,VILLAGE_KEY,emptySlots,type Slots} from './village-storage.ts';
 import {play,unlockAudio} from 'plinkfx';
 let soundEnabled=false;
@@ -19,6 +20,9 @@ let gardenOpen=false;
 let feedback='';
 let storageConflict=false;
 let activeView:'learn'|'village'|'explore'='learn';
+let sortCareer='free';
+let sortSession:SortSession=createSortSession(sortMissions.free);
+let sortSelectedItem:string|null=null;
 let finished=false;
 let saving=false;
 let sessionCompleted=0;
@@ -145,6 +149,22 @@ function render(){
   nav.append(button);
  }
  shell.querySelector('footer')?.before(nav);
+ const explorePanel=shell.querySelector<HTMLElement>('#view-explore');
+ if(explorePanel){
+  const mission=sortMissions[sortCareer]??sortMissions.free;
+  const result=checkSortSession(mission,sortSession);
+  const activity=document.createElement('section');
+  activity.className='quiz sort-activity';
+  activity.setAttribute('aria-label','물건 분류 미니게임');
+  activity.innerHTML=`<h3>🧺 ${escape(mission.title)}</h3><p>${escape(mission.instruction)}</p>
+   <label for="sort-career">탐험 역할 미리보기</label>
+   <select id="sort-career">${Object.keys(sortMissions).map(key=>`<option value="${key}" ${key===sortCareer?'selected':''}>${escape(({doctor:'의사',lawyer:'변호사',police:'경찰',rescue:'119 구조대원',scientist:'과학자',president:'대통령',astronaut:'우주비행사',teacher:'교사',free:'자유 탐험'} as Record<string,string>)[key])}</option>`).join('')}</select>
+   <p role="status" class="sort-status">${result.completed?'🎉 분류 성공!':`정답 ${result.correct}/${result.total} · 물건을 선택한 다음 분류함을 누르세요.`}</p>
+   <div class="sort-items" aria-label="분류할 물건">${mission.items.map(item=>`<button type="button" data-sort-item="${escape(item.id)}" aria-pressed="${sortSelectedItem===item.id}" ${result.completed?'disabled':''}>${escape(item.label)}${sortSession.placements[item.id]?' · '+escape(sortSession.placements[item.id]):''}</button>`).join('')}</div>
+   <div class="sort-groups" aria-label="분류함">${mission.groups.map(group=>`<button type="button" data-sort-group="${escape(group)}" ${result.completed?'disabled':''}>${escape(group)}</button>`).join('')}</div>
+   <button type="button" id="sort-reset">다시 분류하기</button>`;
+  explorePanel.append(activity);
+ }
  const recovery=shell.querySelector('#reload-records');
  if(recovery)toolbar.after(recovery);
  if(preserveLand&&existingLand){existingLand.classList.remove('village-grown');root.querySelector('.land')?.replaceWith(existingLand);}
@@ -165,6 +185,32 @@ function render(){
   root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.view===view)));
   root.querySelector<HTMLElement>('#view-'+view+' .view-heading')?.focus();
  }));
+ root.querySelector<HTMLSelectElement>('#sort-career')?.addEventListener('change',event=>{
+  if(saving)return;
+  const key=(event.target as HTMLSelectElement).value;
+  if(!Object.prototype.hasOwnProperty.call(sortMissions,key))return;
+  sortCareer=key;
+  sortSession=createSortSession(sortMissions[key]);
+  sortSelectedItem=null;
+  render();
+ });
+ root.querySelectorAll<HTMLButtonElement>('[data-sort-item]').forEach(button=>button.addEventListener('click',()=>{
+  if(saving||sortSession.completed)return;
+  sortSelectedItem=button.dataset.sortItem??null;
+  render();
+ }));
+ root.querySelectorAll<HTMLButtonElement>('[data-sort-group]').forEach(button=>button.addEventListener('click',()=>{
+  if(saving||!sortSelectedItem||sortSession.completed)return;
+  sortSession=placeSortItem(sortMissions[sortCareer],sortSession,sortSelectedItem,button.dataset.sortGroup??'');
+  sortSelectedItem=null;
+  render();
+ }));
+ root.querySelector('#sort-reset')?.addEventListener('click',()=>{
+  if(saving)return;
+  sortSession=createSortSession(sortMissions[sortCareer]);
+  sortSelectedItem=null;
+  render();
+ });
  root.querySelector('#sound')?.addEventListener('click',()=>{soundEnabled=!soundEnabled;if(soundEnabled){try{unlockAudio();sound('click-soft');}catch{/* optional audio */}}render();});
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
   if(saving){(e.target as HTMLSelectElement).value=String(state.grade);return;}
