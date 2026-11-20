@@ -147,6 +147,12 @@ try{
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'sorting at 320px must not overflow');
  assert.deepEqual(sortingErrors,[],'sorting interactions must not cause browser errors');
  const puzzleStorage=await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1'));
+ const careerPuzzleNames=['doctor','lawyer','police','rescue','scientist','president','astronaut','teacher','free'];
+ for(const career of careerPuzzleNames){
+  await sorting.locator('#puzzle-career').selectOption(career);
+  assert.equal(await sorting.locator('[data-puzzle-tile]').count(),4,'four tiles for '+career);
+  assert.match(await sorting.locator('.puzzle-status').innerText(),/조각 두 개/);
+ }
  await sorting.locator('#puzzle-career').selectOption('astronaut');
  assert.match(await sorting.locator('.puzzle-activity h3').innerText(),/우주 탐사/);
  const puzzleButtons=sorting.locator('[data-puzzle-tile]');
