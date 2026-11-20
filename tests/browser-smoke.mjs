@@ -157,10 +157,15 @@ try{
  assert.match(await sorting.locator('.puzzle-activity h3').innerText(),/우주 탐사/);
  const puzzleButtons=sorting.locator('[data-puzzle-tile]');
  assert.equal(await puzzleButtons.count(),4);
- await puzzleButtons.nth(0).click();
+ await puzzleButtons.nth(0).focus();
+ await sorting.keyboard.press('Enter');
  assert.equal(await sorting.locator('[data-puzzle-tile][aria-pressed="true"]').count(),1);
- await puzzleButtons.nth(3).click();
+ assert.match(await sorting.locator('.puzzle-status').innerText(),/첫 번째 조각/);
+ assert.equal(await sorting.locator('[data-puzzle-tile]:focus').count(),1);
+ await puzzleButtons.nth(3).focus();
+ await sorting.keyboard.press('Enter');
  assert.equal(await sorting.locator('[data-puzzle-tile][aria-pressed="true"]').count(),0);
+ assert.match(await sorting.locator('.puzzle-status').innerText(),/조각 위치를 바꿨어요/);
  await puzzleButtons.nth(1).click();
  await puzzleButtons.nth(2).click();
  assert.match(await sorting.locator('.puzzle-status').innerText(),/퍼즐 완성/);
