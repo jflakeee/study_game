@@ -27,6 +27,7 @@ let sortSelectedItem:string|null=null;
 let sortFeedback='';
 let puzzleCareer='free';
 let puzzleSession:PuzzleSession=createPuzzleSession(puzzleMissions.free);
+let puzzleNotice='';
 let finished=false;
 let saving=false;
 let sessionCompleted=0;
@@ -169,14 +170,14 @@ function render(){
    <button type="button" id="sort-reset">다시 분류하기</button>`;
   explorePanel.append(activity);
   const puzzleMission=puzzleForGrade(puzzleMissions[puzzleCareer]??puzzleMissions.free,state.grade);
-  if(puzzleSession.missionId!==puzzleMission.id)puzzleSession=createPuzzleSession(puzzleMission);
+  if(puzzleSession.missionId!==puzzleMission.id){puzzleSession=createPuzzleSession(puzzleMission);puzzleNotice='';}
   const puzzle=document.createElement('section');
   puzzle.className='quiz puzzle-activity';
   puzzle.setAttribute('aria-label','조각 퍼즐 미니게임');
   puzzle.innerHTML=`<h3>🧩 ${escape(puzzleMission.title)}</h3><p>${escape(puzzleMission.instruction)}</p>
    <label for="puzzle-career">퍼즐 이야기 선택</label>
    <select id="puzzle-career">${Object.keys(puzzleMissions).map(key=>`<option value="${key}" ${key===puzzleCareer?'selected':''}>${escape(({free:'자유 탐험',doctor:'의사',lawyer:'변호사',police:'경찰',rescue:'119 구조대원',scientist:'과학자',president:'대통령',astronaut:'우주비행사',teacher:'교사'} as Record<string,string>)[key])}</option>`).join('')}</select>
-   <p role="status" aria-live="polite" class="puzzle-status">${puzzleSession.completed?'🎉 퍼즐 완성!':'조각 두 개를 차례로 눌러 위치를 바꿔 보세요.'}</p>
+   <p role="status" aria-live="polite" class="puzzle-status">${puzzleSession.completed?'🎉 퍼즐 완성!':escape(puzzleNotice||(puzzleSession.selected?'첫 번째 조각을 골랐어요. 바꿀 조각을 선택해 주세요.':'조각 두 개를 차례로 눌러 위치를 바꿔 보세요.'))}</p>
    <div class="puzzle-tiles" aria-label="순서를 맞출 퍼즐 조각">${puzzleSession.order.map((id,i)=>{const tile=puzzleMission.tiles.find(item=>item.id===id)!;return `<button type="button" data-puzzle-tile="${escape(id)}" aria-pressed="${puzzleSession.selected===id}" ${puzzleSession.completed?'disabled':''} aria-label="${i+1}번째 자리, ${escape(tile.label)}">${escape(tile.label)}</button>`;}).join('')}</div>
    <button type="button" id="puzzle-reset">퍼즐 다시 시작</button>`;
   explorePanel.append(puzzle);
@@ -243,6 +244,7 @@ function render(){
   const key=(event.target as HTMLSelectElement).value;
   if(!Object.prototype.hasOwnProperty.call(puzzleMissions,key))return;
   puzzleCareer=key;
+  puzzleNotice='';
   puzzleSession=createPuzzleSession(puzzleForGrade(puzzleMissions[key],state.grade));
   render();
   root.querySelector<HTMLSelectElement>('#puzzle-career')?.focus();
@@ -250,7 +252,9 @@ function render(){
  root.querySelectorAll<HTMLButtonElement>('[data-puzzle-tile]').forEach(button=>button.addEventListener('click',()=>{
   if(saving||puzzleSession.completed)return;
   const id=button.dataset.puzzleTile??'';
+  const previousSelected=puzzleSession.selected;
   puzzleSession=selectPuzzleTile(puzzleForGrade(puzzleMissions[puzzleCareer],state.grade),puzzleSession,id);
+  puzzleNotice=previousSelected&&previousSelected!==id?'조각 위치를 바꿨어요. 순서를 살펴보세요.':'';
   render();
   if(puzzleSession.completed)root.querySelector<HTMLButtonElement>('#puzzle-reset')?.focus();
   else root.querySelectorAll<HTMLButtonElement>('[data-puzzle-tile]').forEach(tile=>{if(tile.dataset.puzzleTile===id)tile.focus();});
@@ -258,6 +262,7 @@ function render(){
  root.querySelector('#puzzle-reset')?.addEventListener('click',()=>{
   if(saving)return;
   puzzleSession=createPuzzleSession(puzzleForGrade(puzzleMissions[puzzleCareer],state.grade));
+  puzzleNotice='';
   render();
   root.querySelector<HTMLButtonElement>('#puzzle-reset')?.focus();
  });
