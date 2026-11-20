@@ -179,7 +179,7 @@ try{
  assert.equal(await sorting.locator('.hidden-hints li').count(),3);
  await sorting.locator('[data-hidden-object="star"]').focus();
  await sorting.keyboard.press('Enter');
- assert.equal(await sorting.locator('#hidden-hint:focus').count(),1,'keyboard focus must remain in the hidden-object activity');
+ assert.equal(await sorting.locator('[data-hidden-object="radio"]:focus').count(),1,'keyboard focus advances to next unfound object');
  assert.match(await sorting.locator('.hidden-status').innerText(),/1\/3/);
  assert.equal(await sorting.locator('.hidden-hints li').count(),2);
  assert.equal(await sorting.locator('[data-hidden-object="star"]:disabled').count(),1,'found object cannot be collected twice');
@@ -187,7 +187,8 @@ try{
  await sorting.locator('[data-view="learn"]').click();
  await sorting.locator('[data-view="explore"]').click();
  assert.match(await sorting.locator('.hidden-status').innerText(),/1\/3/);
- await sorting.locator('[data-hidden-object="radio"]').click();
+ await sorting.keyboard.press('Enter');
+ assert.equal(await sorting.locator('[data-hidden-object="glove"]:focus').count(),1,'second discovery advances focus');
  await sorting.locator('[data-hidden-object="glove"]').click();
  assert.match(await sorting.locator('.hidden-status').innerText(),/모두 찾았어요/);
  assert.equal(await sorting.locator('[data-hidden-object]:disabled').count(),3,'all objects are disabled after completion');
