@@ -174,7 +174,7 @@ function render(){
   puzzle.setAttribute('aria-label','조각 퍼즐 미니게임');
   puzzle.innerHTML=`<h3>🧩 ${escape(puzzleMission.title)}</h3><p>${escape(puzzleMission.instruction)}</p>
    <label for="puzzle-career">퍼즐 이야기 선택</label>
-   <select id="puzzle-career">${Object.keys(puzzleMissions).map(key=>`<option value="${key}" ${key===puzzleCareer?'selected':''}>${escape(({free:'자유 탐험',doctor:'의사',astronaut:'우주비행사',teacher:'교사'} as Record<string,string>)[key])}</option>`).join('')}</select>
+   <select id="puzzle-career">${Object.keys(puzzleMissions).map(key=>`<option value="${key}" ${key===puzzleCareer?'selected':''}>${escape(({free:'자유 탐험',doctor:'의사',lawyer:'변호사',police:'경찰',rescue:'119 구조대원',scientist:'과학자',president:'대통령',astronaut:'우주비행사',teacher:'교사'} as Record<string,string>)[key])}</option>`).join('')}</select>
    <p role="status" aria-live="polite" class="puzzle-status">${puzzleSession.completed?'🎉 퍼즐 완성!':'조각 두 개를 차례로 눌러 위치를 바꿔 보세요.'}</p>
    <div class="puzzle-tiles" aria-label="순서를 맞출 퍼즐 조각">${puzzleSession.order.map((id,i)=>{const tile=puzzleMission.tiles.find(item=>item.id===id)!;return `<button type="button" data-puzzle-tile="${escape(id)}" aria-pressed="${puzzleSession.selected===id}" ${puzzleSession.completed?'disabled':''} aria-label="${i+1}번째 자리, ${escape(tile.label)}">${escape(tile.label)}</button>`;}).join('')}</div>
    <button type="button" id="puzzle-reset">퍼즐 다시 시작</button>`;
