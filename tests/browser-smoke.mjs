@@ -188,6 +188,7 @@ try{
  await sorting.locator('[data-view="learn"]').click();
  await sorting.locator('[data-view="explore"]').click();
  assert.match(await sorting.locator('.hidden-status').innerText(),/1\/3/);
+ await sorting.locator('[data-hidden-object="radio"]').focus();
  await sorting.keyboard.press('Enter');
  assert.equal(await sorting.locator('[data-hidden-object="glove"]:focus').count(),1,'second discovery advances focus');
  await sorting.locator('[data-hidden-object="glove"]').click();
