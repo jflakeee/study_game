@@ -1,4 +1,5 @@
 import './style.css';
+import {puzzleMissions,createPuzzleSession,selectPuzzleTile,type PuzzleSession} from './puzzle-game.ts';
 import {sortMissions,createSortSession,placeSortItem,checkSortSession,type SortSession} from './sort-game.ts';
 import {loadVillage,saveVillage,VILLAGE_KEY,emptySlots,type Slots} from './village-storage.ts';
 import {play,unlockAudio} from 'plinkfx';
@@ -24,6 +25,8 @@ let sortCareer='free';
 let sortSession:SortSession=createSortSession(sortMissions.free);
 let sortSelectedItem:string|null=null;
 let sortFeedback='';
+let puzzleCareer='free';
+let puzzleSession:PuzzleSession=createPuzzleSession(puzzleMissions.free);
 let finished=false;
 let saving=false;
 let sessionCompleted=0;
@@ -165,6 +168,17 @@ function render(){
    <div class="sort-groups" aria-label="분류함">${mission.groups.map(group=>`<button type="button" data-sort-group="${escape(group)}" ${result.completed?'disabled':''}>${escape(group)}</button>`).join('')}</div>
    <button type="button" id="sort-reset">다시 분류하기</button>`;
   explorePanel.append(activity);
+  const puzzleMission=puzzleMissions[puzzleCareer]??puzzleMissions.free;
+  const puzzle=document.createElement('section');
+  puzzle.className='quiz puzzle-activity';
+  puzzle.setAttribute('aria-label','조각 퍼즐 미니게임');
+  puzzle.innerHTML=`<h3>🧩 ${escape(puzzleMission.title)}</h3><p>${escape(puzzleMission.instruction)}</p>
+   <label for="puzzle-career">퍼즐 이야기 선택</label>
+   <select id="puzzle-career">${Object.keys(puzzleMissions).map(key=>`<option value="${key}" ${key===puzzleCareer?'selected':''}>${escape(({free:'자유 탐험',doctor:'의사',astronaut:'우주비행사',teacher:'교사'} as Record<string,string>)[key])}</option>`).join('')}</select>
+   <p role="status" aria-live="polite" class="puzzle-status">${puzzleSession.completed?'🎉 퍼즐 완성!':'조각 두 개를 차례로 눌러 위치를 바꿔 보세요.'}</p>
+   <div class="puzzle-tiles" aria-label="순서를 맞출 퍼즐 조각">${puzzleSession.order.map((id,i)=>{const tile=puzzleMission.tiles.find(item=>item.id===id)!;return `<button type="button" data-puzzle-tile="${escape(id)}" aria-pressed="${puzzleSession.selected===id}" ${puzzleSession.completed?'disabled':''} aria-label="${i+1}번째 자리, ${escape(tile.label)}">${escape(tile.label)}</button>`;}).join('')}</div>
+   <button type="button" id="puzzle-reset">퍼즐 다시 시작</button>`;
+  explorePanel.append(puzzle);
  }
  const recovery=shell.querySelector('#reload-records');
  if(recovery)toolbar.after(recovery);
@@ -222,6 +236,29 @@ function render(){
   sortFeedback='';
   render();
   root.querySelector<HTMLButtonElement>('#sort-reset')?.focus();
+ });
+ root.querySelector<HTMLSelectElement>('#puzzle-career')?.addEventListener('change',event=>{
+  if(saving)return;
+  const key=(event.target as HTMLSelectElement).value;
+  if(!Object.prototype.hasOwnProperty.call(puzzleMissions,key))return;
+  puzzleCareer=key;
+  puzzleSession=createPuzzleSession(puzzleMissions[key]);
+  render();
+  root.querySelector<HTMLSelectElement>('#puzzle-career')?.focus();
+ });
+ root.querySelectorAll<HTMLButtonElement>('[data-puzzle-tile]').forEach(button=>button.addEventListener('click',()=>{
+  if(saving||puzzleSession.completed)return;
+  const id=button.dataset.puzzleTile??'';
+  puzzleSession=selectPuzzleTile(puzzleMissions[puzzleCareer],puzzleSession,id);
+  render();
+  if(puzzleSession.completed)root.querySelector<HTMLButtonElement>('#puzzle-reset')?.focus();
+  else root.querySelectorAll<HTMLButtonElement>('[data-puzzle-tile]').forEach(tile=>{if(tile.dataset.puzzleTile===id)tile.focus();});
+ }));
+ root.querySelector('#puzzle-reset')?.addEventListener('click',()=>{
+  if(saving)return;
+  puzzleSession=createPuzzleSession(puzzleMissions[puzzleCareer]);
+  render();
+  root.querySelector<HTMLButtonElement>('#puzzle-reset')?.focus();
  });
  root.querySelector('#sound')?.addEventListener('click',()=>{soundEnabled=!soundEnabled;if(soundEnabled){try{unlockAudio();sound('click-soft');}catch{/* optional audio */}}render();});
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
