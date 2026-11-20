@@ -145,6 +145,26 @@ try{
  assert.equal(await sorting.locator('#sort-career:focus').count(),1);
  assert.match(await sorting.locator('.sort-activity h3').innerText(),/건강센터/);
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'sorting at 320px must not overflow');
+ for(const career of ['doctor','lawyer','police','rescue','scientist','president','astronaut','teacher','free']){
+  await sorting.locator('#hidden-career').selectOption(career);
+  assert.equal(await sorting.locator('[data-hidden-object]').count(),3,'three objects for '+career);
+ }
+ await sorting.locator('#hidden-career').selectOption('astronaut');
+ await sorting.locator('#hidden-hint').click();
+ assert.equal(await sorting.locator('.hidden-hints li').count(),3);
+ await sorting.locator('[data-hidden-object="star"]').click();
+ assert.match(await sorting.locator('.hidden-status').innerText(),/1\/3/);
+ assert.equal(await sorting.locator('.hidden-hints li').count(),2);
+ await sorting.locator('[data-view="learn"]').click();
+ await sorting.locator('[data-view="explore"]').click();
+ assert.match(await sorting.locator('.hidden-status').innerText(),/1\/3/);
+ await sorting.locator('[data-hidden-object="radio"]').click();
+ await sorting.locator('[data-hidden-object="glove"]').click();
+ assert.match(await sorting.locator('.hidden-status').innerText(),/모두 찾았어요/);
+ assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1')),puzzleStorage,'object finding must not award study stars');
+ await sorting.locator('#hidden-reset').click();
+ assert.match(await sorting.locator('.hidden-status').innerText(),/0\/3/);
+ assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'object finding at 320px must not overflow');
  assert.deepEqual(sortingErrors,[],'sorting interactions must not cause browser errors');
  const puzzleStorage=await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1'));
  const careerPuzzleNames=['doctor','lawyer','police','rescue','scientist','president','astronaut','teacher','free'];
