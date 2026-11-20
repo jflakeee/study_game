@@ -154,7 +154,9 @@ try{
  await sorting.locator('#hidden-career').selectOption('astronaut');
  await sorting.locator('#hidden-hint').click();
  assert.equal(await sorting.locator('.hidden-hints li').count(),3);
- await sorting.locator('[data-hidden-object="star"]').click();
+ await sorting.locator('[data-hidden-object="star"]').focus();
+ await sorting.keyboard.press('Enter');
+ assert.equal(await sorting.locator('#hidden-hint:focus').count(),1,'keyboard focus must remain in the hidden-object activity');
  assert.match(await sorting.locator('.hidden-status').innerText(),/1\/3/);
  assert.equal(await sorting.locator('.hidden-hints li').count(),2);
  await sorting.locator('[data-view="learn"]').click();
@@ -165,6 +167,7 @@ try{
  assert.match(await sorting.locator('.hidden-status').innerText(),/모두 찾았어요/);
  assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1')),puzzleStorage,'object finding must not award study stars');
  await sorting.locator('#hidden-reset').click();
+ assert.equal(await sorting.locator('#hidden-reset:focus').count(),1,'restart focus must be restored');
  assert.match(await sorting.locator('.hidden-status').innerText(),/0\/3/);
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'object finding at 320px must not overflow');
 
