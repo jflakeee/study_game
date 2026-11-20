@@ -172,6 +172,15 @@ try{
  assert.equal(await sorting.locator('#question-heading').innerText(),sortPrompt);
  await sorting.locator('[data-view="explore"]').click();
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'puzzle at 320px must not overflow');
+ await sorting.locator('[data-view="learn"]').click();
+ for(const [grade,count] of [['2',6],['3',9],['1',4]]){
+  await sorting.locator('#grade').selectOption(grade);
+  await sorting.locator('[data-view="explore"]').click();
+  assert.equal(await sorting.locator('[data-puzzle-tile]').count(),count,'puzzle tile count for grade '+grade);
+  await sorting.locator('[data-view="learn"]').click();
+ }
+ await sorting.locator('[data-view="explore"]').click();
+ assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'grade-adaptive puzzle at 320px must not overflow');
  await sorting.close();
  console.log('PASS career sorting retry, completion, tab switching and learning storage isolation');
  const page=await browser.newPage();
