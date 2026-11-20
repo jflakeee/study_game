@@ -182,12 +182,16 @@ try{
  assert.equal(await sorting.locator('#hidden-hint:focus').count(),1,'keyboard focus must remain in the hidden-object activity');
  assert.match(await sorting.locator('.hidden-status').innerText(),/1\/3/);
  assert.equal(await sorting.locator('.hidden-hints li').count(),2);
+ assert.equal(await sorting.locator('[data-hidden-object="star"]:disabled').count(),1,'found object cannot be collected twice');
+ assert.equal(await sorting.locator('[data-hidden-object="star"]').getAttribute('aria-label'),'⭐ 별 지도 찾기','icon-only object retains its accessible name');
  await sorting.locator('[data-view="learn"]').click();
  await sorting.locator('[data-view="explore"]').click();
  assert.match(await sorting.locator('.hidden-status').innerText(),/1\/3/);
  await sorting.locator('[data-hidden-object="radio"]').click();
  await sorting.locator('[data-hidden-object="glove"]').click();
  assert.match(await sorting.locator('.hidden-status').innerText(),/모두 찾았어요/);
+ assert.equal(await sorting.locator('[data-hidden-object]:disabled').count(),3,'all objects are disabled after completion');
+ assert.equal(await sorting.locator('.hidden-hints li').count(),0,'completed mission has no remaining hints');
  assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1')),puzzleStorage,'object finding must not award study stars');
  await sorting.locator('#hidden-reset').click();
  assert.equal(await sorting.locator('#hidden-reset:focus').count(),1,'restart focus must be restored');
