@@ -1,0 +1,3 @@
+# Studio onboarding — 2026-11-19
+
+User approved existing Study Game, Web, standard, mobile, autonomous. The existing TypeScript/Vite implementation and v1 storage must be preserved. Formal CCGS stage starts at Concept because no canonical GDD or ADR is present; this does not reset the implemented game or imply QA is complete. Production/QA was a provisional description of implementation maturity, not a passed gate. Next: project-stage-detect and existing-project adoption. No native CCGS scripts were executed; settings were written directly using the pinned upstream schema. The four tools remain isolated submodules. Preserve main, P0-B and production Pages; release HOLD. Resolve outstanding stale-tab test and require physical-device evidence before release.

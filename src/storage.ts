@@ -12,3 +12,33 @@ export function parseState(raw:string|null):GameState|null {
 }
 export function loadState(storage:Pick<Storage,'getItem'>,grade:Grade=1):GameState { try{return parseState(storage.getItem(STORAGE_KEY))??createState(grade);}catch{return createState(grade);} }
 export function saveState(storage:Pick<Storage,'setItem'>,state:GameState):boolean {try{storage.setItem(STORAGE_KEY,JSON.stringify(state));return true;}catch{return false;}}
+/** Best-effort stale-tab protection. This is not an atomic cross-tab transaction. */
+export function saveStateIfUnchanged(storage:Pick<Storage,'getItem'|'setItem'>,expected:GameState,next:GameState):'saved'|'conflict'|'error'{
+ try{
+  const current=parseState(storage.getItem(STORAGE_KEY));
+  if(current&&JSON.stringify(current)!==JSON.stringify(expected))return 'conflict';
+  if(!current){
+   if(storage.getItem(STORAGE_KEY)!==null)return 'conflict';
+   if(JSON.stringify(expected)!==JSON.stringify(createState(expected.grade)))return 'conflict';
+  }
+  storage.setItem(STORAGE_KEY,JSON.stringify(next));
+  return 'saved';
+ }catch{return 'error';}
+}
+
+/** Serialize read-check-write under Web Locks where supported.
+ * Fallback retains optimistic conflict detection, but cannot guarantee atomicity.
+ */
+export async function saveStateSafely(
+ storage:Pick<Storage,'getItem'|'setItem'>,
+ expected:GameState,
+ next:GameState,
+ locks?:Pick<LockManager,'request'>
+):Promise<'saved'|'conflict'|'error'>{
+ if(!locks)return saveStateIfUnchanged(storage,expected,next);
+ try{
+  return await locks.request('study-game-v1-state', {mode:'exclusive'},()=>{
+   return saveStateIfUnchanged(storage,expected,next);
+  });
+ }catch{return 'error';}
+}

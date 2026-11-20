@@ -1,0 +1,12 @@
+[submodule "tools/ccgs"]
+	path = tools/ccgs
+	url = https://github.com/Donchitos/Claude-Code-Game-Studios.git
+[submodule "tools/dream-loop"]
+	path = tools/dream-loop
+	url = https://github.com/achimala/dream-loop.git
+[submodule "tools/plinkfx"]
+	path = tools/plinkfx
+	url = https://github.com/maximilianfeix/plinkfx.git
+[submodule "tools/gamedev-agent-skills"]
+	path = tools/gamedev-agent-skills
+	url = https://github.com/gamedev-skills/awesome-gamedev-agent-skills.git

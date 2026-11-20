@@ -1,0 +1,3 @@
+# P2 content and milestone verification
+
+Source baseline c507d27c520cd43456f335552520804ce77b9fab. Extracted question records from learning.ts and milestone thresholds from main.ts using JavaScript. Executed data checks: 36 records, 36 unique IDs, six per grade/subject group, no invalid choice/answer/hint/explanation records, all 18 arithmetic answers correct. Recomputed stage selection at each threshold and immediately below: 0,2,4,8,12,18,24,30,36; all expected levels 1–9. This is source-derived data validation, not execution of the original TypeScript modules, DOM, or CI. Korean pedagogical quality and formal curriculum alignment not certified. Release HOLD; main and public Pages unchanged.

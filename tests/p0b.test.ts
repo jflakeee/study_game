@@ -1,0 +1,17 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {concepts,updateMastery,selectDueConcepts} from '../src/mastery.ts';
+import {beginTutor,advanceTutor} from '../src/tutor.ts';
+import {ratingFromSignal,scheduleFromSignal} from '../src/review-v2.ts';
+import {createState} from '../src/learning.ts';
+import {parseState} from '../src/storage.ts';
+const at='2026-11-12T00:00:00.000Z';
+test('concept catalog spans grades and subjects',()=>{assert.equal(concepts.length,6);for(const g of [1,2,3])for(const s of ['math','korean'])assert.equal(concepts.filter(c=>c.grade===g&&c.subject===s).length,1);});
+test('independent mastery requires distinct checks',()=>{const e=(id:string)=>({conceptId:'x',questionId:id,correct:true,usedHint:false,at});const a=updateMastery(undefined,e('a'));assert.equal(a.level,3);const b=updateMastery(a,e('a'));assert.equal(b.level,3);assert.equal(updateMastery(b,e('b')).level,4);});
+test('hint-assisted success does not certify independence',()=>{const m=updateMastery(undefined,{conceptId:'x',questionId:'a',correct:true,usedHint:true,at});assert.equal(m.level,2);assert.equal(m.uniqueIndependentQuestions.length,0);});
+test('failed review lowers mastery',()=>{let m=updateMastery(undefined,{conceptId:'x',questionId:'a',correct:true,usedHint:false,at});m=updateMastery(m,{conceptId:'x',questionId:'b',correct:true,usedHint:false,at});assert.equal(updateMastery(m,{conceptId:'x',questionId:'c',correct:false,usedHint:false,at}).level,3);});
+test('due selection respects dates',()=>{assert.deepEqual(selectDueConcepts(['a','b'],{a:'2026-11-13T00:00:00.000Z',b:at},new Date(at)),['b']);});
+test('Socratic sequence delays explanation',()=>{let s=beginTutor('q','prompt');for(let i=1;i<=3;i++){const step=advanceTutor(s,false,'hint','explanation');assert.equal(step.showExplanation,i===3);s=step.session;}assert.equal(s.stage,'retest');});
+test('correct answer completes tutor',()=>{assert.equal(advanceTutor(beginTutor('q','p'),true,'h','e').finished,true);});
+test('response-time signals change ratings',()=>{assert.equal(ratingFromSignal({correct:true,usedHint:false,responseMs:5000}),'easy');assert.equal(ratingFromSignal({correct:true,usedHint:false,responseMs:50000}),'hard');assert.equal(ratingFromSignal({correct:false,usedHint:false,responseMs:1000}),'again');});
+test('schedule uses concept-level review',()=>{assert.equal(scheduleFromSignal(undefined,'x',{correct:true,usedHint:false,responseMs:2000},new Date(at)).skillId,'x');});
+test('v1 save compatibility preserved',()=>{assert.deepEqual(parseState(JSON.stringify(createState())),createState());});
