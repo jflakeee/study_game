@@ -234,7 +234,7 @@ try{
  assert.equal(await wrongPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'feedback live region must survive advancing from wrong answer');
  assert.equal(wrong.attempts[0].correct,false,'third wrong answer must be recorded as incorrect');
  assert.equal(wrong.attempts[0].usedHint,true,'tutored incorrect attempt must record hint usage');
- assert.equal(await wrongPage.locator('[data-answer]').nth(1).innerText(),'토끼');
+ assert.match(await wrongPage.locator('[data-answer]').nth(1).innerText(),/토끼$/,'answer label may include decorative icon');
  await wrongPage.locator('[data-answer]').nth(1).click();
  await wrongPage.locator('.feedback').filter({hasText:/정답이에요/}).waitFor();
  await wrongPage.reload();
