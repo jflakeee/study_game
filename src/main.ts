@@ -18,6 +18,7 @@ let gardenGroups=1;
 let gardenOpen=false;
 let feedback='';
 let storageConflict=false;
+let activeView:'learn'|'village'|'explore'='learn';
 let finished=false;
 let saving=false;
 let sessionCompleted=0;
@@ -108,6 +109,44 @@ function render(){
  <details id="village-builder" class="quiz village-builder" ${builderOpen?'open':''}><summary id="builder-toggle">🏡 나만의 마을 꾸미기</summary><div class="builder-palette" aria-label="건축물 선택">${discoveries.slice(0,stageIndex+1).map((name,i)=>`<button type="button" id="palette-${i}" data-building="${i}" aria-pressed="${selectedBuilding===i}" class="building-select"><span aria-hidden="true">${buildingIcons[i]}</span> ${name}</button>`).join('')}</div><p class="building-preview" role="status">선택한 건축물: ${discoveries[selectedBuilding]} · 빈 칸이나 건물을 눌러 배치해요.</p><div class="building-slots" aria-label="나만의 마을">${villageSlots.map((building,i)=>`<button type="button" id="slot-${i}" data-slot="${i}" ${!villageSnapshot.readable?'disabled':''} aria-label="${i+1}번 자리: ${building===null?'빈 칸':discoveries[building]}">${building===null?'＋':building>stageIndex?'🔒':buildingIcons[building]}<small>${building===null?'빈 칸':discoveries[building]}</small></button>`).join('')}</div><div class="building-actions"><button type="button" id="building-undo" ${previousSlots&&villageSnapshot.readable?'':'disabled'}>되돌리기</button><button type="button" id="building-reset" ${!villageSnapshot.readable||villageSlots.every(v=>v===null)?'disabled':''}>비우기</button></div><p class="building-preview" role="status">${escape(villageNotice)}</p></details>
  <details id="world-map" class="quiz world-map" ${worldOpen?'open':''}><summary id="world-toggle">🗺️ 지식 왕국 탐험 · ${stageIndex+1}/${stages.length}</summary><ol class="world-route">${stages.map((item,i)=>`<li><button type="button" id="region-${i}" data-region="${i}" aria-pressed="${selectedRegion===i}" ${i>stageIndex?'disabled':''}><span aria-hidden="true">${i>stageIndex?'🔒':buildingIcons[i]}</span><strong>${item.name}</strong><small>${i>stageIndex?'별 '+item.stars+'개에 해금':'탐험 가능'}</small></button></li>`).join('')}</ol><div class="region-story" role="status"><strong>${stages[selectedRegion].name}</strong><p>${stories[selectedRegion]}</p></div></details>
  <footer>기록은 이 브라우저에 저장돼요 · 복습은 학습 개념별로 진행돼요</footer></div>`;
+ const shell=root.querySelector<HTMLElement>('.shell')!;
+ const toolbar=shell.querySelector<HTMLElement>('.toolbar')!;
+ const views=[
+  {id:'learn',label:'📚 학습',items:['.quest','.quiz[aria-label="개념별 학습 현황"]']},
+  {id:'village',label:'🏡 마을',items:['.village','#village-journal','#village-builder']},
+  {id:'explore',label:'🧭 탐험',items:['#world-map']}
+ ] as const;
+ const nav=document.createElement('nav');
+ nav.className='mobile-nav';
+ nav.setAttribute('aria-label','주요 화면');
+ for(const view of views){
+  const panel=document.createElement('section');
+  panel.id='view-'+view.id;
+  panel.className='view-panel';
+  panel.hidden=activeView!==view.id;
+  panel.setAttribute('aria-label',view.label);
+  const heading=document.createElement('h2');
+  heading.className='view-heading';
+  heading.tabIndex=-1;
+  heading.textContent=view.label;
+  panel.append(heading);
+  for(const selector of view.items){
+   const item=shell.querySelector(selector);
+   if(item)panel.append(item);
+  }
+  toolbar.after(panel);
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='mobile-nav-button';
+  button.dataset.view=view.id;
+  button.setAttribute('aria-controls',panel.id);
+  button.setAttribute('aria-pressed',String(activeView===view.id));
+  button.textContent=view.label;
+  nav.append(button);
+ }
+ shell.querySelector('footer')?.before(nav);
+ const recovery=shell.querySelector('#reload-records');
+ if(recovery)toolbar.after(recovery);
  if(preserveLand&&existingLand){existingLand.classList.remove('village-grown');root.querySelector('.land')?.replaceWith(existingLand);}
  if(existingFeedback){
   const replacement=root.querySelector<HTMLElement>('.feedback');
@@ -117,6 +156,15 @@ function render(){
  else if(focusAnswer!==null&&focusAnswer!==undefined&&finished)root.querySelector<HTMLButtonElement>('#next')?.focus();
  else if(focusAnswer!==null&&focusAnswer!==undefined)root.querySelector<HTMLButtonElement>(`[data-answer="${focusAnswer}"]`)?.focus();
  else if(focusId)root.querySelector<HTMLElement>(`#${focusId}`)?.focus();
+ root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button=>button.addEventListener('click',()=>{
+  if(saving)return;
+  const view=button.dataset.view;
+  if(view!=='learn'&&view!=='village'&&view!=='explore')return;
+  activeView=view;
+  root.querySelectorAll<HTMLElement>('.view-panel').forEach(panel=>{panel.hidden=panel.id!=='view-'+view;});
+  root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.view===view)));
+  root.querySelector<HTMLElement>('#view-'+view+' .view-heading')?.focus();
+ }));
  root.querySelector('#sound')?.addEventListener('click',()=>{soundEnabled=!soundEnabled;if(soundEnabled){try{unlockAudio();sound('click-soft');}catch{/* optional audio */}}render();});
  root.querySelector<HTMLSelectElement>('#grade')?.addEventListener('change',async e=>{
   if(saving){(e.target as HTMLSelectElement).value=String(state.grade);return;}
