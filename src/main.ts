@@ -301,7 +301,7 @@ function render(){
   hiddenSession=findHiddenObject(hiddenMissions[hiddenCareer],hiddenSession,button.dataset.hiddenObject??'');
   render();
   if(hiddenSession.completed)root.querySelector<HTMLButtonElement>('#hidden-reset')?.focus();
-  else root.querySelector<HTMLButtonElement>('#hidden-hint')?.focus();
+  else root.querySelector<HTMLButtonElement>('[data-hidden-object]:not(:disabled)')?.focus();
  }));
  root.querySelector('#hidden-hint')?.addEventListener('click',()=>{
   hiddenHint=!hiddenHint;
