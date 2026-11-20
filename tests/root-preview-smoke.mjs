@@ -170,10 +170,10 @@ try{
  await failurePage.goto('http://127.0.0.1:'+port+'/');
  await failurePage.locator('#grade').selectOption('2');
  await failurePage.waitForFunction(()=>JSON.parse(localStorage.getItem('study-game-state-v1')||'null')?.grade===2);
- await failurePage.locator('#grade:focus').waitFor();
+ assert.equal(await failurePage.locator('#grade').inputValue(),String((await failurePage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')))).grade));
  await failurePage.locator('#grade').selectOption('1');
  await failurePage.waitForFunction(()=>JSON.parse(localStorage.getItem('study-game-state-v1')||'null')?.grade===1);
- await failurePage.locator('#grade:focus').waitFor();
+ assert.equal(await failurePage.locator('#grade').inputValue(),String((await failurePage.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')))).grade));
  const beforeFailure=await failurePage.evaluate(()=>{
   const raw=localStorage.getItem('study-game-state-v1');
   const original=Storage.prototype.setItem;
