@@ -193,7 +193,10 @@ function render(){
    <label for="hidden-career">찾기 장소 선택</label>
    <select id="hidden-career">${Object.keys(hiddenMissions).map(key=>`<option value="${key}" ${key===hiddenCareer?'selected':''}>${escape(({free:'자유 탐험',doctor:'의사',lawyer:'변호사',police:'경찰',rescue:'119 구조대원',scientist:'과학자',president:'대통령',astronaut:'우주비행사',teacher:'교사'} as Record<string,string>)[key])}</option>`).join('')}</select>
    <p class="hidden-status" role="status" aria-live="polite">${hiddenSession.completed?'🎉 물건을 모두 찾았어요!':`찾은 물건 ${hiddenSession.found.length}/${hiddenMission.objects.length}`}</p>
-   <div class="hidden-scene" aria-label="물건 찾기 활동 공간">${hiddenMission.objects.map((object,i)=>`<button type="button" data-hidden-object="${escape(object.id)}" ${hiddenSession.found.includes(object.id)?'disabled':''} aria-label="${escape(object.label)} 찾기" class="hidden-object hidden-object-${i}">${hiddenSession.found.includes(object.id)?'✓ ':''}${escape(object.label)}</button>`).join('')}</div>
+   <p class="hidden-targets">찾을 물건: ${hiddenMission.objects.map(object=>escape(object.label.replace(/^\\S+\\s*/,''))).join(' · ')}</p>
+   <div class="hidden-scene hidden-scene-${escape(hiddenCareer)}" aria-label="${escape(hiddenMission.scene)} 물건 찾기 활동 공간">
+    <div class="hidden-scenery" aria-hidden="true"><span>☁️</span><span>🏠</span><span>🌳</span><span>🌿</span></div>
+    ${hiddenMission.objects.map((object,i)=>`<button type="button" data-hidden-object="${escape(object.id)}" ${hiddenSession.found.includes(object.id)?'disabled':''} aria-label="${escape(object.label)} 찾기" class="hidden-object hidden-object-${i}">${hiddenSession.found.includes(object.id)?'✓':escape(object.label.split(' ')[0])}</button>`).join('')}</div>
    <button type="button" id="hidden-hint" aria-expanded="${hiddenHint}">힌트 ${hiddenHint?'닫기':'보기'}</button>
    ${hiddenHint?`<ul class="hidden-hints">${hiddenMission.objects.filter(object=>!hiddenSession.found.includes(object.id)).map(object=>`<li>${escape(object.hint)}</li>`).join('')}</ul>`:''}
    <button type="button" id="hidden-reset">다시 찾기</button>`;
