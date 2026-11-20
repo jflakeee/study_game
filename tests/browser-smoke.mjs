@@ -196,7 +196,7 @@ try{
  assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-state-v1')),puzzleStorage,'object finding reset must not alter learning progress');
  await sorting.reload();
  await sorting.locator('[data-view="explore"]').click();
- assert.equal(await sorting.locator('#hidden-career').inputValue(),'astronaut','career selection remains in current browser session');
+ assert.equal(await sorting.locator('#hidden-career').inputValue(),'free','unsaved career selection resets on full reload');
  assert.match(await sorting.locator('.hidden-status').innerText(),/0\/3/,'reset state survives rerender after reload');
  assert.equal(await sorting.evaluate(()=>localStorage.getItem('study-game-village-v1')),villageBeforeMinigames,'reload preserves village save');
  assert.equal(await sorting.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'object finding at 320px must not overflow');
