@@ -21,6 +21,18 @@ export function selectPuzzleTile(mission:PuzzleMission,session:PuzzleSession,id:
  const completed=order.every((tile,i)=>tile===mission.tiles[i].id);
  return {...session,order,selected:null,completed};
 }
+export function puzzleForGrade(mission:PuzzleMission,grade:1|2|3):PuzzleMission{
+ validatePuzzleMission(mission);
+ if(grade===1)return mission;
+ const extras:PuzzleTile[]=[
+  {id:'bonus-review',label:'⑤ 순서 다시 살펴보기'},
+  {id:'bonus-explain',label:'⑥ 친구에게 설명하기'},
+  {id:'bonus-note',label:'⑦ 배운 점 적기'},
+  {id:'bonus-share',label:'⑧ 배운 점 나누기'},
+  {id:'bonus-finish',label:'⑨ 마무리하기'}
+ ];
+ return {...mission,id:mission.id+'-grade-'+grade,tiles:[...mission.tiles,...extras.slice(0,grade===2?2:5)]};
+}
 export const puzzleMissions:Record<string,PuzzleMission>={
  free:{id:'free-puzzle',title:'숲속 이야기 퍼즐',instruction:'그림 조각 대신 이야기 순서 조각을 맞춰 보세요.',tiles:[{id:'seed',label:'① 씨앗 심기'},{id:'water',label:'② 물 주기'},{id:'sprout',label:'③ 싹이 나기'},{id:'flower',label:'④ 꽃 피기'}]},
  doctor:{id:'doctor-puzzle',title:'건강센터 퍼즐',instruction:'건강센터에서 할 일을 순서대로 맞춰 보세요.',tiles:[{id:'welcome',label:'① 인사하기'},{id:'listen',label:'② 이야기 듣기'},{id:'check',label:'③ 살펴보기'},{id:'guide',label:'④ 건강 안내'}]},
