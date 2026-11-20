@@ -23,6 +23,16 @@ try{
   await page.locator('h1').waitFor();
   assert.match(await page.locator('h1').innerText(),/지식 탐험대/);
   assert.equal(await page.locator('[data-answer]').count(),3);
+  const initialQuestion=await page.locator('#question-heading').innerText();
+  const initialStorage=await page.evaluate(()=>localStorage.getItem('study-game-state-v1'));
+  for(const view of ['village','explore','learn']){
+   await page.locator('[data-view="'+view+'"]').click();
+   assert.equal(await page.locator('.view-panel:visible').count(),1);
+   assert.equal(await page.locator('#view-'+view).isVisible(),true);
+  }
+  assert.equal(await page.locator('#question-heading').innerText(),initialQuestion);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('study-game-state-v1')),initialStorage);
+
   const dimensions=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
   assert.ok(dimensions.scroll<=dimensions.client,'horizontal overflow at '+width+': '+JSON.stringify(dimensions));
   await page.locator('#grade').selectOption('2');
@@ -30,9 +40,9 @@ try{
   assert.match(await page.locator('.subject').innerText(),/2학년/);
   await page.locator('#hint').click();
   assert.ok((await page.locator('.feedback').innerText()).length>0);
-  const touchTargets=await page.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).map(el=>({label:el.textContent?.trim()||el.getAttribute('aria-label')||el.tagName,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
+  const touchTargets=await page.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled&&el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0).map(el=>({label:el.textContent?.trim()||el.getAttribute('aria-label')||el.tagName,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
   for(const target of touchTargets)assert.ok(target.width>=44&&target.height>=44,'small touch target at '+width+': '+JSON.stringify(target));
-  const clipped=await page.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).filter(el=>{const r=el.getBoundingClientRect();return r.left<0||r.right>innerWidth}).map(el=>el.textContent?.trim()));
+  const clipped=await page.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled&&el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0).filter(el=>{const r=el.getBoundingClientRect();return r.left<0||r.right>innerWidth}).map(el=>el.textContent?.trim()));
   assert.deepEqual(clipped,[],'clipped controls at '+width);
   const textClipping=await page.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>{
    const style=getComputedStyle(el);
@@ -53,9 +63,9 @@ try{
   await landscape.goto('http://127.0.0.1:'+port+'/study_game/');
   const overflow=await landscape.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
   assert.ok(overflow.scroll<=overflow.client,'landscape horizontal overflow at '+width+'x'+height+': '+JSON.stringify(overflow));
-  const clipped=await landscape.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>el.scrollWidth>el.clientWidth+2||el.scrollHeight>el.clientHeight+2).map(el=>el.textContent?.trim().slice(0,60)));
+  const clipped=await landscape.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0).filter(el=>el.scrollWidth>el.clientWidth+2||el.scrollHeight>el.clientHeight+2).map(el=>el.textContent?.trim().slice(0,60)));
   assert.deepEqual(clipped,[],'landscape clipped content at '+width+'x'+height);
-  const targets=await landscape.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).map(el=>({label:el.textContent?.trim(),width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
+  const targets=await landscape.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled&&el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0).map(el=>({label:el.textContent?.trim(),width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
   for(const target of targets)assert.ok(target.width>=44&&target.height>=44,'landscape small target at '+width+'x'+height+': '+JSON.stringify(target));
   await landscape.locator('[data-answer]').nth(1).focus();
   await landscape.keyboard.press('Enter');
@@ -88,9 +98,9 @@ try{
   await enlarged.addStyleTag({content:`html{font-size:${16*scale}px!important}`});
   const overflow=await enlarged.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
   assert.ok(overflow.scroll<=overflow.client,'horizontal overflow at 320px with '+scale+'x root font: '+JSON.stringify(overflow));
-  const clipped=await enlarged.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>el.scrollWidth>el.clientWidth+2||el.scrollHeight>el.clientHeight+2).map(el=>el.textContent?.trim().slice(0,60)));
+  const clipped=await enlarged.locator('h1,h2,p,small,label,.subject,.feedback,button,select').evaluateAll(elements=>elements.filter(el=>el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0).filter(el=>el.scrollWidth>el.clientWidth+2||el.scrollHeight>el.clientHeight+2).map(el=>el.textContent?.trim().slice(0,60)));
   assert.deepEqual(clipped,[],'clipped content at 320px with '+scale+'x root font');
-  const targets=await enlarged.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled).map(el=>({label:el.textContent?.trim(),width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
+  const targets=await enlarged.locator('button,select').evaluateAll(elements=>elements.filter(el=>!el.disabled&&el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0).map(el=>({label:el.textContent?.trim(),width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
   for(const target of targets)assert.ok(target.width>=44&&target.height>=44,'small target at '+scale+'x: '+JSON.stringify(target));
   await enlarged.locator('[data-answer]').nth(1).focus();
   await enlarged.keyboard.press('Enter');
