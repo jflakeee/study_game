@@ -32,10 +32,19 @@ jobs:
         run: |
           npm run build:preview
           node tests/root-preview-smoke.mjs
-      - name: Upload browser screenshots on failure
-        if: failure()
+      - name: Record verification outcome
+        if: always()
+        run: |
+          echo '## Study Game branch verification' >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`$GITHUB_SHA\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Job status: \`$JOB_STATUS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo '- Scope: TypeScript build, unit tests, Chromium browser smoke, root preview smoke' >> "$GITHUB_STEP_SUMMARY"
+        env:
+          JOB_STATUS: ${{ job.status }}
+      - name: Upload browser screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-failure-screenshots
+          name: browser-verification-screenshots
           path: test-artifacts/
           if-no-files-found: ignore
