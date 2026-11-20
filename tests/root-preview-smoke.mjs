@@ -25,6 +25,16 @@ try{
  await page.addInitScript(()=>{Math.random=()=>0;});
  await page.goto('http://127.0.0.1:'+port+'/');
  await page.locator('h1').filter({hasText:/지식 탐험대/}).waitFor();
+ const initialRaw=await page.evaluate(()=>localStorage.getItem('study-game-state-v1'));
+ const initialPrompt=await page.locator('#question-heading').innerText();
+ for(const view of ['village','explore','learn']){
+  await page.locator('[data-view="'+view+'"]').click();
+  assert.equal(await page.locator('#view-'+view).isVisible(),true,'selected view visible');
+  assert.equal(await page.locator('[data-view="'+view+'"]').getAttribute('aria-pressed'),'true','active tab marked');
+  assert.equal(await page.locator('.view-panel:visible').count(),1,'one view visible');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('study-game-state-v1')),initialRaw,'tab switch must not write');
+ }
+ assert.equal(await page.locator('#question-heading').innerText(),initialPrompt,'tab switch preserves question');
  assert.equal(await page.locator('[data-answer]').count(),3);
  await page.locator('[data-answer]').nth(1).click();
  await page.locator('.feedback').filter({hasText:/별 1개 획득/}).waitFor();
@@ -78,7 +88,7 @@ try{
  const nextPage=track(await browser.newPage());
  await nextPage.addInitScript(()=>{Math.random=()=>0;});
  await nextPage.goto('http://127.0.0.1:'+port+'/');
- const skippedPrompt=await nextPage.locator('.quiz h2').last().innerText();
+ const skippedPrompt=await nextPage.locator('#question-heading').innerText();
  await nextPage.evaluate(()=>{window.__feedbackNode=document.querySelector('.feedback');});
  await nextPage.locator('#next').focus();
  await nextPage.keyboard.press('Enter');
@@ -89,7 +99,7 @@ try{
  assert.equal(await nextPage.evaluate(()=>document.querySelector('.feedback')===window.__feedbackNode),true,'live feedback node must persist after skipping to another question');
  assert.equal(await nextPage.locator('[data-answer]:not([disabled])').count(),3,'next question must have enabled answers');
  assert.equal(await nextPage.locator('.feedback').innerText(),'','new question must clear prior feedback');
- assert.notEqual(await nextPage.locator('.quiz h2').last().innerText(),skippedPrompt,'skip must not repeat the previous question when alternatives exist');
+ assert.notEqual(await nextPage.locator('#question-heading').innerText(),skippedPrompt,'skip must not repeat the previous question when alternatives exist');
  assert.equal(await nextPage.locator('#session-goal-progress').getAttribute('value'),'0','skipping must not count toward session goal');
  await nextPage.close();
  const conflictPage=track(await browser.newPage());
@@ -136,7 +146,7 @@ try{
   void navigator.locks.request('study-game-v1-state',async()=>{acquired();await hold;});
   await ready;
  });
- const pendingPrompt=await pendingPage.locator('.quiz h2').last().innerText();
+ const pendingPrompt=await pendingPage.locator('#question-heading').innerText();
  await pendingPage.locator('[data-answer]').nth(1).click();
  try{
   await pendingPage.locator('[data-answer]').nth(1).click();
@@ -144,7 +154,7 @@ try{
   await pendingPage.locator('#next').click();
   await pendingPage.locator('#grade').selectOption('2');
   assert.equal(await pendingPage.locator('#grade').inputValue(),'1','pending save must reject grade changes');
-  assert.equal(await pendingPage.locator('.quiz h2').last().innerText(),pendingPrompt,'pending save must reject navigation');
+  assert.equal(await pendingPage.locator('#question-heading').innerText(),pendingPrompt,'pending save must reject navigation');
   assert.equal(await pendingPage.locator('.feedback').innerText(),'','pending save must reject hints');
   assert.equal(await pendingPage.evaluate(()=>localStorage.getItem('study-game-state-v1')),null,'held lock must prevent early writes');
  }finally{
