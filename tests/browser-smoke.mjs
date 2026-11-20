@@ -124,8 +124,10 @@ try{
  await sorting.locator('[data-sort-group="식량"]').click();
  assert.equal(await sorting.locator('[data-sort-group="식량"]:focus').count(),1);
  assert.match(await sorting.locator('.sort-status').innerText(),/정답 0\/3/);
+ assert.match(await sorting.locator('.sort-status').innerText(),/다시 생각해 보세요/);
  await sorting.locator('[data-sort-item="camera"]').click();
  await sorting.locator('[data-sort-group="탐사 도구"]').click();
+ assert.match(await sorting.locator('.sort-status').innerText(),/잘했어요/);
  await sorting.locator('[data-sort-item="scanner"]').click();
  await sorting.locator('[data-sort-group="탐사 도구"]').click();
  await sorting.locator('[data-view="learn"]').click();
