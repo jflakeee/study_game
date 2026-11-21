@@ -32,6 +32,6 @@ test('Korean sentences use correct object particles and sentence punctuation', (
   }
   const g3 = koreanGenerator(3);
   for (let i = 0; i < g3.count; i++) {
-    assert.match(questionAt(g3,i).prompt,/\\. 이 글의 중심 내용은 무엇인가요\\?$/);
+    assert.match(questionAt(g3,i).prompt,/\. 이 글의 중심 내용은 무엇인가요\?$/);
   }
 });
