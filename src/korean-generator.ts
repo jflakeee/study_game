@@ -25,6 +25,15 @@ const actions = [
 ] as const;
 const contexts = ['오늘','어제','아침에','오후에','주말에','방과 후에','집에서','학교에서','친구와','가족과'];
 const people = ['민지','준호','수아','지훈','유나','도윤','하린','서준','지아','현우'];
+// Counts distinct learning concepts, not cosmetic context/name variations.
+export const KOREAN_CONCEPT_COUNTS = {1: vocabulary.length, 2: causes.length, 3: actions.length} as const;
+const hasFinalConsonant = (word: string): boolean => {
+  const code = word.codePointAt(word.length - 1) ?? 0;
+  return code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0;
+};
+const objectParticle = (word: string): string => hasFinalConsonant(word) ? '을' : '를';
+const subjectParticle = (word: string): string => hasFinalConsonant(word) ? '이' : '가';
+const topicParticle = (word: string): string => hasFinalConsonant(word) ? '은' : '는';
 const distractors = ['운동','독서','요리','그림 그리기','청소','노래 부르기','낚시','등산','수영','춤추기','장보기','게임하기'];
 
 export function koreanGenerator(grade: Grade): QuestionGenerator {
@@ -42,17 +51,17 @@ export function koreanGenerator(grade: Grade): QuestionGenerator {
       const person = people[personIndex], context = contexts[contextIndex];
       let prompt: string, answer: string, hint: string, explanation: string, wrong: string[];
       if (grade === 1) {
-        prompt = `${context} ${person}가 '${word}'를 보았어요. '${word}'는 무엇에 속하나요?`;
+        prompt = `${context} ${person}${subjectParticle(person)} '${word}'${objectParticle(word)} 보았어요. '${word}'${topicParticle(word)} 무엇에 속하나요?`;
         answer = category; wrong = ['과일','동물','학용품','탈것','악기'].filter(x => x !== answer).slice(0, 2);
         hint = '물건이나 생물의 종류를 생각해 보세요.';
-        explanation = `${word}는 ${category}에 속해요.`;
+        explanation = `${word}${topicParticle(word)} ${category}에 속해요.`;
       } else if (grade === 2) {
-        prompt = `${context} ${person}는 ${cause} ${effect}. 그렇게 행동한 까닭은 무엇인가요?`;
+        prompt = `${context} ${person}${topicParticle(person)} ${cause} ${effect}. 그렇게 행동한 까닭은 무엇인가요?`;
         answer = cause; wrong = causes.filter(([c]) => c !== answer).slice((variant + 1) % 8, ((variant + 1) % 8) + 2).map(([c]) => c);
         hint = '앞부분에서 이유를 찾아 보세요.';
-        explanation = `${effect}의 까닭은 '${cause}'예요.`;
+        explanation = `그렇게 한 까닭은 '${cause}'예요.`;
       } else {
-        prompt = `${context} ${person}는 ${action} 이 글의 중심 내용은 무엇인가요?`;
+        prompt = `${context} ${person}${topicParticle(person)} ${action}. 이 글의 중심 내용은 무엇인가요?`;
         answer = topic; wrong = distractors.filter(x => x !== answer).slice((variant + 1) % 8, ((variant + 1) % 8) + 2);
         hint = '글에서 가장 중요한 행동을 찾아 보세요.';
         explanation = `이 글은 '${topic}'에 관한 내용이에요.`;
