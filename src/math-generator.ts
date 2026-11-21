@@ -17,7 +17,10 @@ export function mathGenerator(grade: Grade): QuestionGenerator {
       const result = grade === 1 && mode === 1 ? b : grade === 1 && mode === 2 ? a : multiply ? a * b : a + b;
       const prompt = grade === 1 && mode === 1 ? `${a} + ? = ${a + b}` :
         grade === 1 && mode === 2 ? `${a + b} - ${b} = ?` : `${a} ${multiply ? '×' : '+'} ${b} = ?`;
-      const choices = [String(result), String(result + 1), String(result + (multiply ? 2 : 10))];
+      const distractors = grade === 1
+        ? [result === 40 ? 39 : result + 1, result <= 30 ? result + 10 : result - 10]
+        : [result + 1, result + (multiply ? 2 : 10)];
+      const choices = [String(result), ...distractors.map(String)];
       const shift = index % choices.length;
       const rotated = [...choices.slice(shift), ...choices.slice(0, shift)];
       return {
