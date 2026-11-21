@@ -12,8 +12,8 @@ for (const grade of [1, 2, 3] as const) {
       const question = questionAt(generator, sequentialIndex(i, generator.count, 71));
       ids.add(question.id);
       prompts.add(question.prompt);
-      const normal = question.prompt.match(/^(\\d+) ([+×-]) (\\d+) = \\?$/);
-      const missing = question.prompt.match(/^(\\d+) \\+ \\? = (\\d+)$/);
+      const normal = question.prompt.match(/^(\d+) ([+×-]) (\d+) = \?$/);
+      const missing = question.prompt.match(/^(\d+) \+ \? = (\d+)$/);
       assert.ok(normal || missing, question.prompt);
       if (normal) {
         const a = Number(normal[1]), b = Number(normal[3]);
