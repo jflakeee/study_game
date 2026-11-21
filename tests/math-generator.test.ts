@@ -25,6 +25,7 @@ for (const grade of [1, 2, 3] as const) {
         assert.ok(Number(missing[2]) <= 40);
       }
       assert.equal(question.choices.filter(choice => choice === question.answer).length, 1);
+      if (grade === 1) assert.ok(question.choices.every(choice => Number(choice) >= 0 && Number(choice) <= 40), question.prompt);
     }
     assert.equal(ids.size, 1200);
     assert.equal(prompts.size, 1200);
