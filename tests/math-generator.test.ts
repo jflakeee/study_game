@@ -12,10 +12,18 @@ for (const grade of [1, 2, 3] as const) {
       const question = questionAt(generator, sequentialIndex(i, generator.count, 71));
       ids.add(question.id);
       prompts.add(question.prompt);
-      const match = question.prompt.match(/^(\d+) ([+×]) (\d+) = \?$/);
-      assert.ok(match, question.prompt);
-      const a = Number(match[1]), b = Number(match[3]);
-      assert.equal(Number(question.answer), match[2] === '×' ? a * b : a + b);
+      const normal = question.prompt.match(/^(\\d+) ([+×-]) (\\d+) = \\?$/);
+      const missing = question.prompt.match(/^(\\d+) \\+ \\? = (\\d+)$/);
+      assert.ok(normal || missing, question.prompt);
+      if (normal) {
+        const a = Number(normal[1]), b = Number(normal[3]);
+        const expected = normal[2] === '×' ? a * b : normal[2] === '-' ? a - b : a + b;
+        assert.equal(Number(question.answer), expected);
+        if (grade === 1) assert.ok(a <= 40 && b <= 40 && expected <= 40 && expected >= 0);
+      } else if (missing) {
+        assert.equal(Number(question.answer), Number(missing[2]) - Number(missing[1]));
+        assert.ok(Number(missing[2]) <= 40);
+      }
       assert.equal(question.choices.filter(choice => choice === question.answer).length, 1);
     }
     assert.equal(ids.size, 1200);
