@@ -12,7 +12,7 @@ for (const grade of [1, 2, 3] as const) {
       const question = questionAt(generator, sequentialIndex(i, generator.count, 71));
       ids.add(question.id);
       prompts.add(question.prompt);
-      const match = question.prompt.match(/^(\\d+) ([+×]) (\\d+) = \\?$/);
+      const match = question.prompt.match(/^(\d+) ([+×]) (\d+) = \?$/);
       assert.ok(match, question.prompt);
       const a = Number(match[1]), b = Number(match[3]);
       assert.equal(Number(question.answer), match[2] === '×' ? a * b : a + b);
