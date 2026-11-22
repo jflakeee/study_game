@@ -140,3 +140,15 @@ test('reload during an unanswered question preserves progress and no phantom rew
   await expect(page.locator('.progress')).toContainText('0 / 1200');
   await expect(page.locator('#hint-text')).toBeEmpty();
 });
+
+test('selected generated mode and subject restore automatically on reload',async({page})=>{
+  await page.goto('/');
+  await page.locator('#mode').selectOption('generated');
+  await page.locator('#subject').selectOption('korean');
+  const question=await page.locator('.quiz h2').innerText();
+  await page.reload();
+  await expect(page.locator('#mode')).toHaveValue('generated');
+  await expect(page.locator('#subject')).toHaveValue('korean');
+  await expect(page.locator('.quiz h2')).toHaveText(question);
+  await expect(page.locator('.progress')).toContainText('0 / 1200');
+});
