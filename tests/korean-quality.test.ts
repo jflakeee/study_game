@@ -74,3 +74,19 @@ test('grade 2 cause questions use a complete sentence before asking why',async()
     assert.ok(!q.prompt.includes('..'),q.id);
   }
 });
+
+test('grade 1 and 2 distractor sets vary between concepts',async()=>{
+  const {koreanQuestionAt}=await import('../src/korean-generator.ts');
+  for(const grade of [1,2] as const){
+    const wrongSets=new Set<string>();
+    const count=grade===1?40:20;
+    for(let i=0;i<count;i++){
+      const q=koreanQuestionAt(grade,i);
+      const wrong=q.choices.filter(c=>c!==q.answer);
+      assert.equal(wrong.length,2,q.id);
+      assert.equal(new Set(wrong).size,2,q.id);
+      wrongSets.add([...wrong].sort().join('|'));
+    }
+    assert.ok(wrongSets.size>=4,`grade ${grade} needs varied distractors`);
+  }
+});
