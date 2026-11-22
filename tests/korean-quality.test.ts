@@ -29,3 +29,25 @@ test('grade 3 reading prompts never add a conflicting location prefix',async()=>
     assert.ok(!/^(집에서|학교에서|친구와|가족과) /.test(q.prompt),q.id);
   }
 });
+
+test('Korean grades 1 and 2 have expanded semantic concepts without ambiguous vocabulary',async()=>{
+  const {KOREAN_CONCEPT_COUNTS,koreanQuestionAt}=await import('../src/korean-generator.ts');
+  assert.equal(KOREAN_CONCEPT_COUNTS[1],45);
+  assert.equal(KOREAN_CONCEPT_COUNTS[2],20);
+  const categories=new Map<string,string>();
+  for(let i=0;i<45;i++){
+    const q=koreanQuestionAt(1,i);
+    const word=q.prompt.match(/'([^']+)'/g)?.[0];
+    assert.ok(word,q.id);
+    assert.ok(!categories.has(word!),`duplicate category term: ${word}`);
+    categories.set(word!,q.answer);
+  }
+  for(let i=0;i<1200;i++){
+    for(const grade of [1,2] as const){
+      const q=koreanQuestionAt(grade,i);
+      assert.equal(q.choices.length,3,q.id);
+      assert.equal(new Set(q.choices).size,3,q.id);
+      assert.ok(q.choices.includes(q.answer),q.id);
+    }
+  }
+});
