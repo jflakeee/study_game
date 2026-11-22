@@ -51,3 +51,17 @@ test('Korean grades 1 and 2 have expanded semantic concepts without ambiguous vo
     }
   }
 });
+
+test('grade 3 reading expands to 24 semantic actions with valid options',async()=>{
+  const {KOREAN_CONCEPT_COUNTS,koreanQuestionAt}=await import('../src/korean-generator.ts');
+  assert.equal(KOREAN_CONCEPT_COUNTS[3],24);
+  const topics=new Set<string>();
+  for(let i=0;i<1200;i++){
+    const q=koreanQuestionAt(3,i);
+    assert.equal(q.choices.length,3,q.id);
+    assert.equal(new Set(q.choices).size,3,q.id);
+    assert.ok(q.choices.includes(q.answer),q.id);
+    if(i<24)topics.add(q.answer);
+  }
+  assert.equal(topics.size,24);
+});
