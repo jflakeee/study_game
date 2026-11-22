@@ -73,3 +73,20 @@ test('legacy state write failure also blocks generated cursor advancement',async
   await expect(page.locator('.quiz h2')).toHaveText(first);
   await expect(page.locator('.progress')).toContainText('0 / 1200');
 });
+
+test('duplicate clicks on the same answer button grant at most one attempt',async({page})=>{
+  await page.goto('/');
+  await page.locator('#mode').selectOption('generated');
+  await page.locator('[data-answer]').first().evaluate((button:HTMLElement)=>{
+    button.click();
+    button.click();
+  });
+  await expect(page.locator('.progress')).toContainText('1 / 1200');
+  const attempts=await page.evaluate(()=>{
+    const state=JSON.parse(localStorage.getItem('study-game-state-v1')??'null');
+    return state?.attempts?.length??null;
+  });
+  // The cursor is the primary guard; a second click must not advance twice.
+  await expect(page.locator('.progress')).toContainText('1 / 1200');
+  if(attempts!==null)expect(attempts).toBe(1);
+});
