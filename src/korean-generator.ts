@@ -79,7 +79,7 @@ export function koreanGenerator(grade: Grade): QuestionGenerator {
         hint = '물건이나 생물의 종류를 생각해 보세요.';
         explanation = `${word}${topicParticle(word)} ${category}에 속해요.`;
       } else if (grade === 2) {
-        prompt = `${context} ${person}${topicParticle(person)} ${cause} ${effect} 그렇게 행동한 까닭은 무엇인가요?`;
+        prompt = `${context} ${person}${topicParticle(person)} ${cause} ${effect}. 그렇게 행동한 까닭은 무엇인가요?`;
         answer = cause; wrong = causes.filter(([c]) => c !== answer).slice((variant + 1) % 8, ((variant + 1) % 8) + 2).map(([c]) => c);
         hint = '앞부분에서 이유를 찾아 보세요.';
         explanation = `그렇게 한 까닭은 '${cause}'예요.`;
