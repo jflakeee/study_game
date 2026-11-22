@@ -19,7 +19,7 @@ for (const grade of [1,2,3] as const) {
 }
 
 test('Korean question counts distinguish surface variants from learning concepts', () => {
-  assert.deepEqual(KOREAN_CONCEPT_COUNTS,{1:25,2:12,3:12});
+  assert.deepEqual(KOREAN_CONCEPT_COUNTS,{1:40,2:20,3:12});
   for (const grade of [1,2,3] as const) {
     assert.ok(KOREAN_CONCEPT_COUNTS[grade] < koreanGenerator(grade).count);
   }
