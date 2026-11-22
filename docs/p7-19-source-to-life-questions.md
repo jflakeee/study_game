@@ -1,25 +1,11 @@
-# 실제 공개 문제지 참고 → 생활형 독립 문제 제작 (P7-19)
+# P7-19 — Private research policy
 
-## 원칙
-1. 교육청·공공기관의 실제 문제지는 **문제 유형·성취기준·난이도**만 참고한다. 문장, 수치 조합, 등장인물, 지문, 삽화, 선택지를 단순 치환하지 않는다.
-2. 게임 문제는 학교, 집, 놀이터, 가게, 도서관, 버스, 날씨 등 아동이 경험할 수 있는 **새로운 맥락**에서 독립 작성한다.
-3. 원본과 새 문제는 **출처 ID / 문항 ID / 생성 문제 ID**로 연결해 사후 비교 가능하게 한다. 유사도는 자동 지표만으로 저작권 적합성을 판단하지 않고 사람이 검토한다.
-4. 원문 PDF·스캔·문항 전사본은 **저작권·접근 권한 확인 후 비공개 저장소**에만 보관한다. 이 공개 저장소와 GitHub Pages에는 올리지 않는다.
-5. 출처 공개 URL, 기관명, 자료명, 페이지·문항 번호, 접근일, 라이선스 검토 상태만 공개 메타데이터에 기록한다. 공개가 허용되지 않은 원문이나 해설은 넣지 않는다.
-6. 원본 확보가 되지 않은 자료는 `not-collected`로 표시하고, 다운로드나 비교를 완료했다고 주장하지 않는다.
+All collected materials are **private**, including original PDFs, scans, screenshots, extracted text, source URLs/catalogs, licenses, comparison records, research notes and intermediate drafts.
 
-## 저장 구조
-- `research/source-catalog.json`: 공개 가능한 출처 메타데이터. 원본 PDF 자체는 포함하지 않음.
-- `research/originals-private/`: **로컬/비공개 전용**, Git에서 제외. 원본 파일명은 `sourceId__original.pdf` 등으로 통일.
-- `research/comparisons.json`: 원본 문항 위치와 신규 문제 ID, 유형 및 차이점 기록. 원문 텍스트는 포함하지 않음.
-- `research/life-question-examples.json`: 자체 작성한 생활형 예시. 추후 출제기 연결 전까지 연구용 데이터.
-
-## 검토 순서
-출처의 공식성 확인 → 원본 이용 조건 확인 → 원본 비공개 수집 → 페이지/문항별 유형 분류 → 새 생활형 문제 독립 작성 → 정답 유일성·학년 적합성·원문과의 표현 중복 검토 → 승인된 새 문제만 게임 반영.
-
-## 비교 기록 필수 필드
-`sourceId`, `sourceQuestionLocator`, `newQuestionId`, `grade`, `subject`, `skill`, `type`, `independentScenario`, `differences`, `reviewStatus`.
-출처 문항을 실제로 열람하지 않았다면 `sourceQuestionLocator`를 임의 생성하지 않는다.
-
-## 공개/비공개 경계
-Git 추적에서 제외하는 것만으로 보안이 보장되지 않는다. 원문은 접근 제어가 있는 별도 비공개 저장소 또는 로컬 디스크에 보관하고, 공개 Git에 한 번이라도 커밋하지 않는다. 공개 저장소에서 원문을 지운 후에도 Git 이력에 남을 수 있다.
+- Store collected material only in a separate access-controlled private repository or encrypted local storage, **never in this public repository or GitHub Pages**.
+- The `research/` and `private/` directories are ignored for future untracked files.
+- Publish only independently authored, reviewed game questions and executable code. Do not publish source-question locators, source lists or mappings.
+- The previously committed research JSON files were deleted from the branch, but **deleting files does not erase Git history**. They remain potentially accessible in earlier commits and PR diffs until history is rewritten and references are cleaned.
+- Do not put any further collected materials on this branch. Before merging, audit history and remove research blobs from public history through a coordinated history rewrite or fresh clean branch. Avoid force-pushing shared branches without coordination.
+- Existing research JSONs contained sample metadata and independently authored examples; no original PDF was collected or uploaded in P7-19.
+- Future research collection requires an approved private destination and confirmed permissions.
