@@ -56,7 +56,7 @@ const hasFinalConsonant = (word: string): boolean => {
 const objectParticle = (word: string): string => hasFinalConsonant(word) ? '을' : '를';
 const subjectParticle = (word: string): string => hasFinalConsonant(word) ? '이' : '가';
 const topicParticle = (word: string): string => hasFinalConsonant(word) ? '은' : '는';
-const distractors = ['운동','독서','요리','그림 그리기','청소','노래 부르기','낚시','등산','수영','춤추기','장보기','게임하기'];
+const distractors = ['운동','독서','요리','그림 그리기','청소','노래 부르기','낚시','등산','수영','춤추기','장보기','게임하기','악기 연주','책 정리','화분 옮기기','달리기'];
 
 export function koreanGenerator(grade: Grade): QuestionGenerator {
   const skillId = grade === 1 ? 'korean.vocabulary.categories' : grade === 2 ? 'korean.sentences.causes' : 'korean.reading.mainidea';
@@ -85,7 +85,7 @@ export function koreanGenerator(grade: Grade): QuestionGenerator {
         explanation = `그렇게 한 까닭은 '${cause}'예요.`;
       } else {
         prompt = `${context} ${person}${topicParticle(person)} ${action}. 이 글의 중심 내용은 무엇인가요?`;
-        answer = topic; wrong = distractors.filter(x => x !== answer).slice((variant + 1) % 8, ((variant + 1) % 8) + 2);
+        answer = topic; wrong = distractors.filter(x => x !== answer).slice((variant + 1) % 12, ((variant + 1) % 12) + 2);
         hint = '글에서 가장 중요한 행동을 찾아 보세요.';
         explanation = `이 글은 '${topic}'에 관한 내용이에요.`;
       }
