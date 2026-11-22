@@ -65,3 +65,12 @@ test('grade 3 reading expands to 24 semantic actions with valid options',async()
   }
   assert.equal(topics.size,24);
 });
+
+test('grade 2 cause questions use a complete sentence before asking why',async()=>{
+  const {koreanQuestionAt}=await import('../src/korean-generator.ts');
+  for(let i=0;i<1200;i++){
+    const q=koreanQuestionAt(2,i);
+    assert.match(q.prompt,/다\. 그렇게 행동한 까닭은 무엇인가요\?$/,q.id);
+    assert.ok(!q.prompt.includes('..'),q.id);
+  }
+});
