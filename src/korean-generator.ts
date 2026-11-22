@@ -24,6 +24,7 @@ const actions = [
   ['옷을 개어 서랍에 넣었다','옷 정리'],['과일을 씻어 접시에 담았다','간식 준비'],
 ] as const;
 const contexts = ['오늘','어제','아침에','오후에','주말에','방과 후에','집에서','학교에서','친구와','가족과'];
+const readingContexts = ['오늘','어제','아침에','오후에','주말에','방과 후에','지난주에','며칠 전에','어느 날','쉬는 날'];
 const people = ['민지','준호','수아','지훈','유나','도윤','하린','서준','지아','현우'];
 // Counts distinct learning concepts, not cosmetic context/name variations.
 export const KOREAN_CONCEPT_COUNTS = {1: vocabulary.length, 2: causes.length, 3: actions.length} as const;
@@ -48,7 +49,7 @@ export function koreanGenerator(grade: Grade): QuestionGenerator {
       const [word, category] = vocabulary[variant];
       const [cause, effect] = causes[variant % causes.length];
       const [action, topic] = actions[variant % actions.length];
-      const person = people[personIndex], context = contexts[contextIndex];
+      const person = people[personIndex], context = grade === 3 ? readingContexts[contextIndex] : contexts[contextIndex];
       let prompt: string, answer: string, hint: string, explanation: string, wrong: string[];
       if (grade === 1) {
         prompt = `${context} ${person}${subjectParticle(person)} '${word}'${objectParticle(word)} 보았어요. '${word}'${topicParticle(word)} 무엇에 속하나요?`;
@@ -56,7 +57,7 @@ export function koreanGenerator(grade: Grade): QuestionGenerator {
         hint = '물건이나 생물의 종류를 생각해 보세요.';
         explanation = `${word}${topicParticle(word)} ${category}에 속해요.`;
       } else if (grade === 2) {
-        prompt = `${context} ${person}${topicParticle(person)} ${cause} ${effect}. 그렇게 행동한 까닭은 무엇인가요?`;
+        prompt = `${context} ${person}${topicParticle(person)} ${cause} ${effect} 그렇게 행동한 까닭은 무엇인가요?`;
         answer = cause; wrong = causes.filter(([c]) => c !== answer).slice((variant + 1) % 8, ((variant + 1) % 8) + 2).map(([c]) => c);
         hint = '앞부분에서 이유를 찾아 보세요.';
         explanation = `그렇게 한 까닭은 '${cause}'예요.`;
