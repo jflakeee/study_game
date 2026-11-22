@@ -13,3 +13,19 @@ test('Korean audit reports distinct prompts and limited underlying concepts hone
     assert.ok(report.answerLeakCandidates >= 0 && report.answerLeakCandidates <= 1200);
   }
 });
+
+test('grade 2 sentences have no duplicated punctuation',async()=>{
+  const {koreanQuestionAt}=await import('../src/korean-generator.ts');
+  for(let index=0;index<1200;index++){
+    const q=koreanQuestionAt(2,index);
+    assert.ok(!q.prompt.includes('..'),q.id);
+    assert.ok(!q.prompt.includes('다. .'),q.id);
+  }
+});
+test('grade 3 reading prompts never add a conflicting location prefix',async()=>{
+  const {koreanQuestionAt}=await import('../src/korean-generator.ts');
+  for(let index=0;index<1200;index++){
+    const q=koreanQuestionAt(3,index);
+    assert.ok(!/^(집에서|학교에서|친구와|가족과) /.test(q.prompt),q.id);
+  }
+});
