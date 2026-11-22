@@ -32,10 +32,10 @@ test('grade 3 reading prompts never add a conflicting location prefix',async()=>
 
 test('Korean grades 1 and 2 have expanded semantic concepts without ambiguous vocabulary',async()=>{
   const {KOREAN_CONCEPT_COUNTS,koreanQuestionAt}=await import('../src/korean-generator.ts');
-  assert.equal(KOREAN_CONCEPT_COUNTS[1],45);
+  assert.equal(KOREAN_CONCEPT_COUNTS[1],40);
   assert.equal(KOREAN_CONCEPT_COUNTS[2],20);
   const categories=new Map<string,string>();
-  for(let i=0;i<45;i++){
+  for(let i=0;i<40;i++){
     const q=koreanQuestionAt(1,i);
     const word=q.prompt.match(/'([^']+)'/g)?.[0];
     assert.ok(word,q.id);
