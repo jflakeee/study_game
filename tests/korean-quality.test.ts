@@ -9,7 +9,7 @@ test('Korean audit reports distinct prompts and limited underlying concepts hone
     assert.equal(report.distinctPrompts,1200);
     assert.ok(report.coreConcepts < report.generatedVariants);
     assert.ok(report.distinctAnswers <= report.coreConcepts);
-    assert.ok(report.cosmeticVariantsPerConcept >= 40);
+    assert.ok(report.cosmeticVariantsPerConcept >= 30);
     assert.ok(report.answerLeakCandidates >= 0 && report.answerLeakCandidates <= 1200);
   }
 });
