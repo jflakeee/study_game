@@ -90,3 +90,14 @@ test('duplicate clicks on the same answer button grant at most one attempt',asyn
   await expect(page.locator('.progress')).toContainText('1 / 1200');
   if(attempts!==null)expect(attempts).toBe(1);
 });
+
+test('detached answer button from before hint rerender is ignored',async({page})=>{
+  await page.goto('/');
+  await page.locator('#mode').selectOption('generated');
+  await page.evaluate(()=>{(window as Window & {staleAnswer?:HTMLElement}).staleAnswer=document.querySelector('[data-answer]') as HTMLElement;});
+  await page.locator('#hint').click();
+  await page.evaluate(()=>{(window as Window & {staleAnswer?:HTMLElement}).staleAnswer?.click();});
+  await expect(page.locator('.progress')).toContainText('0 / 1200');
+  await page.locator('[data-answer]').first().click();
+  await expect(page.locator('.progress')).toContainText('1 / 1200');
+});
