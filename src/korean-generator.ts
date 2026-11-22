@@ -8,12 +8,21 @@ const vocabulary = [
   ['연필','학용품'],['지우개','학용품'],['공책','학용품'],['자','학용품'],['색연필','학용품'],
   ['버스','탈것'],['기차','탈것'],['자전거','탈것'],['자동차','탈것'],['비행기','탈것'],
   ['피아노','악기'],['바이올린','악기'],['기타','악기'],['북','악기'],['플루트','악기'],
+  ['수박','과일'],['귤','과일'],['복숭아','과일'],
+  ['코끼리','동물'],['호랑이','동물'],['펭귄','동물'],
+  ['가위','학용품'],['필통','학용품'],['풀','학용품'],
+  ['배','탈것'],['오토바이','탈것'],['헬리콥터','탈것'],
+  ['첼로','악기'],['트럼펫','악기'],['하모니카','악기'],
 ] as const;
 const causes = [
   ['비가 와서','우산을 썼다'],['추워서','외투를 입었다'],['배가 고파서','밥을 먹었다'],
   ['목이 말라서','물을 마셨다'],['어두워서','불을 켰다'],['손이 더러워서','손을 씻었다'],
   ['길을 잃어서','길을 물었다'],['피곤해서','잠을 잤다'],['햇빛이 강해서','모자를 썼다'],
   ['연필심이 부러져서','연필을 깎았다'],['비가 그쳐서','우산을 접었다'],['책이 궁금해서','책을 펼쳤다'],
+  ['발이 아파서','잠시 쉬었다'],['시험이 끝나서','책을 덮었다'],
+  ['날씨가 더워서','선풍기를 켰다'],['친구가 넘어져서','친구를 일으켜 주었다'],
+  ['시간이 늦어서','서둘러 집에 갔다'],['신발이 젖어서','마른 신발로 갈아 신었다'],
+  ['창문이 열려 있어서','창문을 닫았다'],['화분의 흙이 말라서','화분에 물을 주었다'],
 ] as const;
 const actions = [
   ['꽃에 물을 주었다','꽃 돌보기'],['길에 떨어진 쓰레기를 주웠다','환경 정리'],
@@ -43,9 +52,10 @@ export function koreanGenerator(grade: Grade): QuestionGenerator {
     grade, subject: 'korean', skillId, count: 1200,
     generate(index: number): Question {
       if (!Number.isSafeInteger(index) || index < 0 || index >= 1200) throw new RangeError('Question index out of range');
-      const variant = index % (grade === 1 ? vocabulary.length : 12);
-      const contextIndex = Math.floor(index / (grade === 1 ? vocabulary.length : 12)) % contexts.length;
-      const personIndex = Math.floor(index / ((grade === 1 ? vocabulary.length : 12) * contexts.length)) % people.length;
+      const conceptCount = grade === 1 ? vocabulary.length : grade === 2 ? causes.length : actions.length;
+      const variant = index % conceptCount;
+      const contextIndex = Math.floor(index / conceptCount) % contexts.length;
+      const personIndex = Math.floor(index / (conceptCount * contexts.length)) % people.length;
       const [word, category] = vocabulary[variant];
       const [cause, effect] = causes[variant % causes.length];
       const [action, topic] = actions[variant % actions.length];
