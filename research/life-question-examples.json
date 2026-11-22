@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "examples": [
+    {
+      "id": "life-g1-math-001",
+      "grade": 1,
+      "subject": "math",
+      "skill": "addition",
+      "type": "생활 상황 덧셈",
+      "prompt": "놀이터에 친구 4명이 놀고 있었어요. 친구 3명이 더 왔어요. 지금 친구는 모두 몇 명인가요?",
+      "choices": [
+        "6명",
+        "7명",
+        "8명"
+      ],
+      "answer": "7명",
+      "scenario": "놀이터에서 친구 만나기",
+      "sourceLinkStatus": "original-independent"
+    },
+    {
+      "id": "life-g2-math-001",
+      "grade": 2,
+      "subject": "math",
+      "skill": "money",
+      "type": "생활 속 금액 계산",
+      "prompt": "문구점에서 500원짜리 지우개와 300원짜리 연필을 샀어요. 모두 얼마인가요?",
+      "choices": [
+        "700원",
+        "800원",
+        "900원"
+      ],
+      "answer": "800원",
+      "scenario": "문구점에서 준비물 사기",
+      "sourceLinkStatus": "original-independent"
+    },
+    {
+      "id": "life-g3-korean-001",
+      "grade": 3,
+      "subject": "korean",
+      "skill": "reading.mainidea",
+      "type": "짧은 글의 중심 내용",
+      "prompt": "지민이는 학교에 갈 때 물병을 챙겼어요. 쉬는 시간마다 물을 마시고, 다 마신 뒤에는 물병을 씻어 가방에 넣었어요. 이 글의 중심 내용은 무엇인가요?",
+      "choices": [
+        "물병을 챙겨 사용한 일",
+        "운동장에서 공놀이한 일",
+        "도서관에서 책을 읽은 일"
+      ],
+      "answer": "물병을 챙겨 사용한 일",
+      "scenario": "학교에서 개인 물병 사용",
+      "sourceLinkStatus": "original-independent"
+    }
+  ]
+}
