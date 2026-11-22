@@ -101,3 +101,42 @@ test('detached answer button from before hint rerender is ignored',async({page})
   await page.locator('[data-answer]').first().click();
   await expect(page.locator('.progress')).toContainText('1 / 1200');
 });
+
+test('switching subject mid-question preserves each track and never submits an answer',async({page})=>{
+  await page.goto('/');
+  await page.locator('#mode').selectOption('generated');
+  const mathQuestion=await page.locator('.quiz h2').innerText();
+  await page.locator('#hint').click();
+  await page.locator('#subject').selectOption('korean');
+  const koreanQuestion=await page.locator('.quiz h2').innerText();
+  await expect(page.locator('.progress')).toContainText('0 / 1200');
+  await page.locator('#subject').selectOption('math');
+  await expect(page.locator('.quiz h2')).toHaveText(mathQuestion);
+  await expect(page.locator('#hint-text')).toBeEmpty();
+  await page.locator('#subject').selectOption('korean');
+  await expect(page.locator('.quiz h2')).toHaveText(koreanQuestion);
+  await page.locator('[data-answer]').first().click();
+  await expect(page.locator('.progress')).toContainText('1 / 1200');
+  await page.locator('#subject').selectOption('math');
+  await expect(page.locator('.progress')).toContainText('0 / 1200');
+  await expect(page.locator('.quiz h2')).toHaveText(mathQuestion);
+  const attempts=await page.evaluate(()=>JSON.parse(localStorage.getItem('study-game-state-v1')??'{}').attempts?.length??0);
+  expect(attempts).toBe(1);
+});
+test('reload during an unanswered question preserves progress and no phantom rewards',async({page})=>{
+  await page.goto('/');
+  await page.locator('#mode').selectOption('generated');
+  await page.locator('#grade').selectOption('3');
+  await page.locator('#subject').selectOption('korean');
+  const question=await page.locator('.quiz h2').innerText();
+  const stars=await page.locator('.stars').innerText();
+  await page.locator('#hint').click();
+  await page.reload();
+  await page.locator('#mode').selectOption('generated');
+  await page.locator('#subject').selectOption('korean');
+  await expect(page.locator('#grade')).toHaveValue('3');
+  await expect(page.locator('.quiz h2')).toHaveText(question);
+  await expect(page.locator('.stars')).toHaveText(stars);
+  await expect(page.locator('.progress')).toContainText('0 / 1200');
+  await expect(page.locator('#hint-text')).toBeEmpty();
+});
