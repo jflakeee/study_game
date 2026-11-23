@@ -1,0 +1,5 @@
+# All collected research, source metadata, comparisons and drafts are private.
+research/
+# Local private research and collected materials outside research/
+private/
+*.source.pdf
