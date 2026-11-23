@@ -21,7 +21,7 @@ export function visualMathScene(question:Question):VisualMathScene|null {
 }
 
 export function renderVisualMathScene(scene:VisualMathScene):string {
-  const dots=(count:number,removed=false)=>Array.from({length:count},()=>`<span class="visual-dot${removed?' removed':''}" aria-hidden="true">●</span>`).join('');
+  const dots=(count:number,eaten=false)=>Array.from({length:count},()=>`<span class="visual-dot${eaten?' eaten':''}" aria-hidden="true">${eaten?'🍎':'🍎'}</span>`).join('');
   const label=scene.kind==='add'?`${scene.initial} 더하기 ${scene.change}`:`${scene.initial} 중 ${scene.change} 빼기`;
   if(scene.kind==='subtract'){
     return `<div class="visual-math" role="img" aria-label="${label}"><div class="visual-group">${dots(scene.answer)}${dots(scene.change,true)}</div><span class="visual-operator" aria-hidden="true">= ?</span></div>`;
