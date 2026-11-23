@@ -8,7 +8,7 @@ test('visual-first addition displays countable apples without visible question s
   await expect(page.locator('#mode')).toHaveValue('generated');
   // Check the first generated grade-one addition scene without relying on visible text.
   await expect(page.locator('.visual-math')).toBeVisible();
-  await expect(page.locator('.quiz h2')).toBeHidden();
+  await expect(page.locator('.quiz h2')).toHaveClass(/visually-hidden/);
   await expect(page.locator('.visual-dot')).toHaveCount(2);
   await expect(page.locator('.visual-dot.eaten')).toHaveCount(0);
   await expect(page.locator('.visual-dot')).first().toContainText('🍎');
