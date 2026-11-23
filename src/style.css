@@ -7,6 +7,8 @@
 .visual-math{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;margin:20px 0;padding:16px;border-radius:16px;background:#f3f8ff}
 .visual-group{display:flex;flex-wrap:wrap;gap:5px;max-width:220px;justify-content:center;align-items:center;min-width:48px}
 .visual-dot{display:inline-flex;width:23px;height:23px;align-items:center;justify-content:center;font-size:22px;color:#2b75cc}
-.visual-dot.removed{color:#a4acb7;text-decoration:line-through;opacity:.55}
+.visual-dot.eaten svg{width:24px;height:28px;display:block}.visual-dot.eaten{color:inherit}
 .visual-operator{font-size:26px;font-weight:800;color:#1b344f}
 @media(max-width:480px){.visual-group{max-width:140px}.visual-dot{width:20px;height:20px;font-size:19px}.visual-math{gap:8px;padding:10px}}
+
+@media(max-width:480px){.visual-dot.eaten svg{width:20px;height:24px}}
