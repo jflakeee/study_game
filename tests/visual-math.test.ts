@@ -26,5 +26,15 @@ test('invalid answer and non-math questions keep text fallback',()=>{
   assert.equal(visualMathScene(question('7 + 5 = ?','11')),null);
   assert.equal(visualMathScene(question('7 + 5 = ?','12',2)),null);
   assert.equal(visualMathScene(question('7 + 5 = ?','12',1,'korean')),null);
-  assert.equal(visualMathScene(question('7 + ? = 12','5')),null);
+  assert.equal(visualMathScene(question('7 + ? = 12','4')),null);
+});
+
+test('missing addend shows known and total apple groups',()=>{
+  const scene=visualMathScene(question('2 + ? = 5','3'));
+  assert.ok(scene);
+  assert.equal(scene.kind,'missing');
+  const html=renderVisualMathScene(scene);
+  assert.equal((html.match(/class="visual-dot"/g)||[]).length,7);
+  assert.match(html,/\+ \? =/);
+  assert.match(html,/aria-label="2 더하기 빈칸은 5"/);
 });
