@@ -18,7 +18,8 @@ test('visual subtraction crosses out only removed items in the original set',()=
   assert.ok(scene);
   const html=renderVisualMathScene(scene);
   assert.equal((html.match(/class="visual-dot/g)||[]).length,13);
-  assert.equal((html.match(/class="visual-dot removed"/g)||[]).length,4);
+  assert.equal((html.match(/class="visual-dot eaten"/g)||[]).length,4);
+  assert.equal((html.match(/<svg viewBox=/g)||[]).length,4);
   assert.doesNotMatch(html,/visual-operator" aria-hidden="true">−/);
 });
 test('invalid answer and non-math questions keep text fallback',()=>{
