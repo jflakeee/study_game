@@ -22,8 +22,9 @@ export function visualMathScene(question:Question):VisualMathScene|null {
 
 export function renderVisualMathScene(scene:VisualMathScene):string {
   const dots=(count:number,removed=false)=>Array.from({length:count},()=>`<span class="visual-dot${removed?' removed':''}" aria-hidden="true">●</span>`).join('');
-  const first=scene.kind==='add'?dots(scene.initial):dots(scene.answer);
-  const second=scene.kind==='add'?dots(scene.change):dots(scene.change,true);
-  const label=scene.kind==='add'?`${scene.initial} 더하기 ${scene.change}`:`${scene.initial} 빼기 ${scene.change}`;
-  return `<div class="visual-math" role="img" aria-label="${label}"><div class="visual-group">${first}</div><span class="visual-operator" aria-hidden="true">${scene.kind==='add'?'+':'−'}</span><div class="visual-group">${second}</div><span class="visual-operator" aria-hidden="true">= ?</span></div>`;
+  const label=scene.kind==='add'?`${scene.initial} 더하기 ${scene.change}`:`${scene.initial} 중 ${scene.change} 빼기`;
+  if(scene.kind==='subtract'){
+    return `<div class="visual-math" role="img" aria-label="${label}"><div class="visual-group">${dots(scene.answer)}${dots(scene.change,true)}</div><span class="visual-operator" aria-hidden="true">= ?</span></div>`;
+  }
+  return `<div class="visual-math" role="img" aria-label="${label}"><div class="visual-group">${dots(scene.initial)}</div><span class="visual-operator" aria-hidden="true">+</span><div class="visual-group">${dots(scene.change)}</div><span class="visual-operator" aria-hidden="true">= ?</span></div>`;
 }
